@@ -5,7 +5,7 @@
 
 'use strict';
 
-const qs  = (sel, ctx = document) => ctx.querySelector(sel);
+const qs = (sel, ctx = document) => ctx.querySelector(sel);
 const qsa = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
 /* ============================================================
@@ -18,9 +18,9 @@ const HireMindStore = (function () {
     return {
       stats: {
         totalInterviews: 0,
-        bestScore:       0,
-        sumScores:       0,   // running sum of all scorePct values (for avg)
-        totalSeconds:    0    // total practice seconds (for hours display)
+        bestScore: 0,
+        sumScores: 0,   // running sum of all scorePct values (for avg)
+        totalSeconds: 0    // total practice seconds (for hours display)
       },
       sessions: []            // session records, newest first, capped at 100
     };
@@ -34,7 +34,7 @@ const HireMindStore = (function () {
       // Merge-in defaults so older saved data with missing keys still works
       const base = _empty();
       return {
-        stats:    Object.assign(base.stats,    parsed.stats    || {}),
+        stats: Object.assign(base.stats, parsed.stats || {}),
         sessions: Array.isArray(parsed.sessions) ? parsed.sessions : []
       };
     } catch (_) {
@@ -64,8 +64,8 @@ const HireMindStore = (function () {
    */
   function computeDisplayStats(stats) {
     const total = stats.totalInterviews;
-    const best  = stats.bestScore;
-    const avg   = total > 0 ? Math.round(stats.sumScores / total) : 0;
+    const best = stats.bestScore;
+    const avg = total > 0 ? Math.round(stats.sumScores / total) : 0;
     // Hours: 1 decimal place, minimum 0.1 when any time was spent
     const rawHours = stats.totalSeconds / 3600;
     const hours = stats.totalSeconds > 0
@@ -88,9 +88,9 @@ const HireMindStore = (function () {
 
     // Recompute all aggregate stats from the full session list (avoids drift)
     data.stats.totalInterviews = data.sessions.length;
-    data.stats.sumScores       = data.sessions.reduce((s, r) => s + (r.scorePct    || 0), 0);
-    data.stats.totalSeconds    = data.sessions.reduce((s, r) => s + (r.totalSeconds || 0), 0);
-    data.stats.bestScore       = data.sessions.reduce((b, r) => Math.max(b, r.scorePct || 0), 0);
+    data.stats.sumScores = data.sessions.reduce((s, r) => s + (r.scorePct || 0), 0);
+    data.stats.totalSeconds = data.sessions.reduce((s, r) => s + (r.totalSeconds || 0), 0);
+    data.stats.bestScore = data.sessions.reduce((b, r) => Math.max(b, r.scorePct || 0), 0);
 
     _persist(data);
     return data.stats;
@@ -98,7 +98,7 @@ const HireMindStore = (function () {
 
   /** Wipe all stored data (utility â€” not yet wired to UI). */
   function clearAll() {
-    try { localStorage.removeItem(KEY); } catch (_) {}
+    try { localStorage.removeItem(KEY); } catch (_) { }
   }
 
   return { getStats, getSessions, saveSession, computeDisplayStats, clearAll };
@@ -108,7 +108,7 @@ const HireMindStore = (function () {
    1. MOBILE HAMBURGER MENU
    ============================================================ */
 (function initMobileMenu() {
-  const btn       = qs('#hamburger-btn');
+  const btn = qs('#hamburger-btn');
   const mobileNav = qs('#mobile-nav');
   if (!btn || !mobileNav) return;
 
@@ -118,7 +118,7 @@ const HireMindStore = (function () {
     const spans = qsa('span', btn);
     if (isOpen) {
       spans[0].style.transform = 'translateY(7px) rotate(45deg)';
-      spans[1].style.opacity   = '0';
+      spans[1].style.opacity = '0';
       spans[2].style.transform = 'translateY(-7px) rotate(-45deg)';
     } else {
       spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
@@ -138,7 +138,7 @@ const HireMindStore = (function () {
    2. NAV ACTIVE STATE
    ============================================================ */
 (function initNavActive() {
-  const navItems    = qsa('.nav-links li a');
+  const navItems = qsa('.nav-links li a');
   const mobileItems = qsa('.mobile-nav a');
 
   function setActive(items, clicked) {
@@ -204,7 +204,7 @@ const HireMindStore = (function () {
   ].join(','));
 
   targets.forEach((el, i) => {
-    el.style.opacity   = '0';
+    el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = `opacity .55s ease ${i * 60}ms, transform .55s cubic-bezier(.34,1.56,.64,1) ${i * 60}ms`;
   });
@@ -212,7 +212,7 @@ const HireMindStore = (function () {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.opacity   = '1';
+        entry.target.style.opacity = '1';
         entry.target.style.transform = 'translateY(0)';
         observer.unobserve(entry.target);
       }
@@ -231,10 +231,10 @@ const HireMindStore = (function () {
     HireMindStore.computeDisplayStats(rawStats);
 
   const statConfig = {
-    'val-total': { end: totalInterviews, suffix: '',  duration: 1200, decimals: 0 },
-    'val-best':  { end: bestScore,       suffix: '%', duration: 1400, decimals: 0 },
-    'val-avg':   { end: avgScore,        suffix: '%', duration: 1300, decimals: 0 },
-    'val-hours': { end: practiceHours,   suffix: 'h', duration: 1100, decimals: 1 },
+    'val-total': { end: totalInterviews, suffix: '', duration: 1200, decimals: 0 },
+    'val-best': { end: bestScore, suffix: '%', duration: 1400, decimals: 0 },
+    'val-avg': { end: avgScore, suffix: '%', duration: 1300, decimals: 0 },
+    'val-hours': { end: practiceHours, suffix: 'h', duration: 1100, decimals: 1 },
   };
 
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
@@ -243,10 +243,10 @@ const HireMindStore = (function () {
     if (end === 0) { el.textContent = '0' + suffix; return; }
     const start = performance.now();
     function step(now) {
-      const elapsed  = now - start;
+      const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
-      const raw      = easeOut(progress) * end;
-      const current  = decimals > 0
+      const raw = easeOut(progress) * end;
+      const current = decimals > 0
         ? parseFloat(raw.toFixed(decimals))
         : Math.round(raw);
       el.textContent = current + suffix;
@@ -280,13 +280,13 @@ const HireMindStore = (function () {
     // Reverse so the newest lands at the top of the feed
     [...recent].reverse().forEach(rec => {
       const color = colorMap[rec.category] || 'cyan';
-      const d     = new Date(rec.date);
-      const when  = isNaN(d) ? 'Earlier' :
+      const d = new Date(rec.date);
+      const when = isNaN(d) ? 'Earlier' :
         d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
         d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const text  = `<strong>${rec.categoryLabel}</strong> completed â€” ` +
-                    `${rec.answered}/${rec.total} answered Â· Score: ` +
-                    `<strong>${rec.scorePct}%</strong> Â· ${rec.timeTaken} Â· ${when}`;
+      const text = `<strong>${rec.categoryLabel}</strong> completed â€” ` +
+        `${rec.answered}/${rec.total} answered Â· Score: ` +
+        `<strong>${rec.scorePct}%</strong> Â· ${rec.timeTaken} Â· ${when}`;
       addActivityEntry(color, text);
     });
   }, 900);
@@ -305,22 +305,22 @@ const HireMindStore = (function () {
   const btnStart = qs('#setup-btn-start');
   const subjectSearch = qs('#subject-search');
   const clearSubjectsBtn = qs('#subjects-clear-btn');
-  
+
   if (!overlay) return;
 
   const categoryLabels = {
-    hr:     'HR Interview',
-    sde:    'Software Developer Interview',
-    web:    'Web Developer Interview',
-    data:   'Data Analyst Interview',
+    hr: 'HR Interview',
+    sde: 'Software Developer Interview',
+    web: 'Web Developer Interview',
+    data: 'Data Analyst Interview',
     custom: 'Custom Interview',
   };
 
   const categoryColors = {
-    hr:     'rgba(0, 212, 255, 1)',
-    sde:    'rgba(124, 58, 237, 1)',
-    web:    'rgba(59, 130, 246, 1)',
-    data:   'rgba(34, 197, 94, 1)',
+    hr: 'rgba(0, 212, 255, 1)',
+    sde: 'rgba(124, 58, 237, 1)',
+    web: 'rgba(59, 130, 246, 1)',
+    data: 'rgba(34, 197, 94, 1)',
     custom: 'rgba(168, 85, 247, 1)',
   };
 
@@ -524,7 +524,7 @@ const HireMindStore = (function () {
 
     overlay.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
-    
+
     setTimeout(() => {
       qs('#field-branch')?.focus();
     }, 100);
@@ -616,7 +616,7 @@ const HireMindStore = (function () {
       } else {
         if (errorEl) errorEl.textContent = '';
       }
-    } 
+    }
     else if (step === 2) {
       const checkedRadio = qs('input[name="year"]:checked');
       const errorEl = qs('#year-error');
@@ -626,7 +626,7 @@ const HireMindStore = (function () {
       } else {
         if (errorEl) errorEl.textContent = '';
       }
-    } 
+    }
     else if (step === 3) {
       const domainVal = qs('#field-domain')?.value;
       const errorEl = qs('#domain-error');
@@ -636,7 +636,7 @@ const HireMindStore = (function () {
       } else {
         if (errorEl) errorEl.textContent = '';
       }
-    } 
+    }
     else if (step === 4) {
       const errorEl = qs('#subjects-error');
       if (selectedSubjects.size === 0) {
@@ -746,10 +746,10 @@ const HireMindStore = (function () {
     // Add activity feed entry
     const branchSelect = qs('#field-branch');
     const branchText = branchSelect?.options[branchSelect.selectedIndex]?.textContent || 'CSE';
-    
+
     const domainSelect = qs('#field-domain');
     const domainText = domainSelect?.options[domainSelect.selectedIndex]?.textContent || 'Web Dev';
-    
+
     const yrVal = qs('input[name="year"]:checked')?.value || '1';
     const yrOrdinal = yrVal === '1' ? '1st' : yrVal === '2' ? '2nd' : yrVal === '3' ? '3rd' : '4th';
 
@@ -757,7 +757,7 @@ const HireMindStore = (function () {
     const subjectsSummary = chosenSubjects.slice(0, 3).join(', ') + (chosenSubjects.length > 3 ? '...' : '');
 
     addActivityEntry(
-      activeCategory === 'data' ? 'green' : activeCategory === 'sde' ? 'violet' : activeCategory === 'web' ? 'blue' : 'cyan', 
+      activeCategory === 'data' ? 'green' : activeCategory === 'sde' ? 'violet' : activeCategory === 'web' ? 'blue' : 'cyan',
       `<strong>${label}</strong> started â€” ${branchText} (${yrOrdinal} Yr) | Domain: ${domainText} | Topics: ${subjectsSummary}`
     );
 
@@ -777,7 +777,7 @@ const HireMindStore = (function () {
   cards.forEach(card => {
     card.addEventListener('click', () => {
       const cat = card.dataset.category;
-      
+
       // Pulse animation
       card.style.transform = 'scale(0.97)';
       setTimeout(() => { card.style.transform = ''; }, 180);
@@ -786,9 +786,9 @@ const HireMindStore = (function () {
     });
 
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { 
-        e.preventDefault(); 
-        card.click(); 
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
       }
     });
   });
@@ -800,7 +800,7 @@ const HireMindStore = (function () {
   // Close triggers
   closeBtn?.addEventListener('click', closeModal);
   backdrop?.addEventListener('click', closeModal);
-  
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !overlay.hasAttribute('hidden')) {
       closeModal();
@@ -833,7 +833,7 @@ const HireMindStore = (function () {
 
   // Step 4 search and clear triggers
   subjectSearch?.addEventListener('input', filterSubjects);
-  
+
   clearSubjectsBtn?.addEventListener('click', () => {
     selectedSubjects.clear();
     const pills = qsa('.subject-pill', qs('#subjects-grid'));
@@ -867,7 +867,7 @@ function addActivityEntry(color, text) {
   const feed = qs('.activity-timeline');
   if (!feed) return;
 
-  const now     = new Date();
+  const now = new Date();
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   const item = document.createElement('div');
@@ -887,7 +887,7 @@ function addActivityEntry(color, text) {
   feed.insertBefore(item, feed.firstChild);
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    item.style.opacity   = '1';
+    item.style.opacity = '1';
     item.style.transform = 'translateX(0)';
   }));
 
@@ -903,11 +903,11 @@ function addActivityEntry(color, text) {
    ============================================================ */
 (function initLiveActivity() {
   const events = [
-    { color: 'cyan',   text: '<strong>AI Engine heartbeat</strong> â€” All interview modules responding normally.' },
+    { color: 'cyan', text: '<strong>AI Engine heartbeat</strong> â€” All interview modules responding normally.' },
     { color: 'violet', text: '<strong>Question Bank updated</strong> â€” 240 new behavioral questions loaded.' },
-    { color: 'green',  text: '<strong>Resume Analysis ready</strong> â€” Upload your CV for instant AI feedback.' },
-    { color: 'blue',   text: '<strong>Performance Tracking</strong> â€” Progress graph synced to your profile.' },
-    { color: 'cyan',   text: '<strong>AI Recruiter Avatar</strong> â€” New personality model: "Senior Tech Lead" available.' },
+    { color: 'green', text: '<strong>Resume Analysis ready</strong> â€” Upload your CV for instant AI feedback.' },
+    { color: 'blue', text: '<strong>Performance Tracking</strong> â€” Progress graph synced to your profile.' },
+    { color: 'cyan', text: '<strong>AI Recruiter Avatar</strong> â€” New personality model: "Senior Tech Lead" available.' },
   ];
 
   let idx = 0;
@@ -933,7 +933,7 @@ function addActivityEntry(color, text) {
   let tX = 0, tY = 0, cX = 0, cY = 0;
 
   window.addEventListener('mousemove', (e) => {
-    tX = (e.clientX / window.innerWidth  - 0.5) * 30;
+    tX = (e.clientX / window.innerWidth - 0.5) * 30;
     tY = (e.clientY / window.innerHeight - 0.5) * 30;
   });
 
@@ -955,8 +955,8 @@ function addActivityEntry(color, text) {
   qsa('.glass-panel').forEach(panel => {
     panel.addEventListener('mousemove', (e) => {
       const r = panel.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width)  * 100;
-      const y = ((e.clientY - r.top)  / r.height) * 100;
+      const x = ((e.clientX - r.left) / r.width) * 100;
+      const y = ((e.clientY - r.top) / r.height) * 100;
       panel.style.backgroundImage = `
         radial-gradient(circle at ${x}% ${y}%, rgba(0,212,255,.04) 0%, transparent 50%),
         linear-gradient(135deg, rgba(0,212,255,.08) 0%, rgba(124,58,237,.08) 100%)
@@ -983,7 +983,7 @@ function addActivityEntry(color, text) {
 (function initSessionNavigation() {
 
   /* â”€â”€ API CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = window.location.origin;
 
   /* â”€â”€ FALLBACK sample questions (used when backend is offline) */
   const sampleQuestions = {
@@ -1018,10 +1018,10 @@ function addActivityEntry(color, text) {
   }
 
   const categoryLabels = {
-    hr:     'HR Interview',
-    sde:    'Software Developer Interview',
-    web:    'Web Developer Interview',
-    data:   'Data Analyst Interview',
+    hr: 'HR Interview',
+    sde: 'Software Developer Interview',
+    web: 'Web Developer Interview',
+    data: 'Data Analyst Interview',
     custom: 'Custom Interview',
   };
 
@@ -1056,20 +1056,20 @@ function addActivityEntry(color, text) {
   let micInterval = null;
 
   /* â”€â”€ DOM REFS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  const isessEndBtn           = qs('#isess-end-btn');
-  const scompleteRetryBtn     = qs('#scomplete-retry-btn');
+  const isessEndBtn = qs('#isess-end-btn');
+  const scompleteRetryBtn = qs('#scomplete-retry-btn');
   const scompleteDashboardBtn = qs('#scomplete-dashboard-btn');
-  const isessSkipBtn          = qs('#isess-skip-btn');
-  const isessNextBtn          = qs('#isess-next-btn');
-  const isessMicBtn           = qs('#isess-mic-btn');
-  const isessCamBtn           = qs('#isess-cam-btn');
-  const isessTextarea         = qs('#isess-textarea');
-  const isessCharCount        = qs('#isess-char-count');
-  const interviewSession      = qs('#interview-session');
-  const sessionComplete       = qs('#session-complete');
-  const navbar                = qs('.navbar');
-  const mobileNav             = qs('#mobile-nav');
-  const pageWrapper           = qs('.page-wrapper');
+  const isessSkipBtn = qs('#isess-skip-btn');
+  const isessNextBtn = qs('#isess-next-btn');
+  const isessMicBtn = qs('#isess-mic-btn');
+  const isessCamBtn = qs('#isess-cam-btn');
+  const isessTextarea = qs('#isess-textarea');
+  const isessCharCount = qs('#isess-char-count');
+  const interviewSession = qs('#interview-session');
+  const sessionComplete = qs('#session-complete');
+  const navbar = qs('.navbar');
+  const mobileNav = qs('#mobile-nav');
+  const pageWrapper = qs('.page-wrapper');
 
   /* â”€â”€ LOADING OVERLAY HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function showLoadingOverlay(message = 'AI is thinkingâ€¦') {
@@ -1139,15 +1139,15 @@ function addActivityEntry(color, text) {
   }
 
   /* â”€â”€ MAIN ENTRY POINT (called by setup modal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  window.startInterviewSession = async function(category, year, branch, domain, subjects) {
+  window.startInterviewSession = async function (category, year, branch, domain, subjects) {
     sessionState.activeCategory = category;
-    sessionState.activeYear     = year    || '1';
-    sessionState.activeBranch   = branch  || 'other';
-    sessionState.activeDomain   = domain  || 'other';
+    sessionState.activeYear = year || '1';
+    sessionState.activeBranch = branch || 'other';
+    sessionState.activeDomain = domain || 'other';
     sessionState.activeSubjects = subjects || [];
-    sessionState.sessionId      = null;
+    sessionState.sessionId = null;
     sessionState.isBackendOnline = false;
-    sessionState.evaluations    = [];
+    sessionState.evaluations = [];
 
     // â”€â”€ Show UI immediately, then load questions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _showSessionScreen(category);
@@ -1165,7 +1165,7 @@ function addActivityEntry(color, text) {
         subjects: subjectsStr,
         year: year || '1'
       });
-      sessionState.sessionId      = sessionData.id;
+      sessionState.sessionId = sessionData.id;
       sessionState.isBackendOnline = true;
 
       // 2. Generate AI questions for this session
@@ -1189,12 +1189,12 @@ function addActivityEntry(color, text) {
     }
 
     // â”€â”€ Initialise state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    sessionState.questions   = questions;
+    sessionState.questions = questions;
     sessionState.currentIndex = 0;
-    sessionState.answers     = Array(questions.length).fill('');
-    sessionState.skips       = Array(questions.length).fill(false);
+    sessionState.answers = Array(questions.length).fill('');
+    sessionState.skips = Array(questions.length).fill(false);
     sessionState.evaluations = Array(questions.length).fill(null);
-    sessionState.startTime   = new Date();
+    sessionState.startTime = new Date();
     sessionState.isSessionActive = true;
 
     // â”€â”€ Render question dots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1220,19 +1220,19 @@ function addActivityEntry(color, text) {
     if (isessMicBtn) isessMicBtn.classList.add('off');
     if (isessCamBtn) isessCamBtn.classList.add('off');
 
-    const camVideo    = qs('#isess-cam-video');
+    const camVideo = qs('#isess-cam-video');
     const placeholder = qs('#isess-cam-placeholder');
-    const offBadge    = qs('#isess-cam-off-badge');
-    if (camVideo)    { camVideo.srcObject = null; camVideo.style.display = 'none'; }
+    const offBadge = qs('#isess-cam-off-badge');
+    if (camVideo) { camVideo.srcObject = null; camVideo.style.display = 'none'; }
     if (placeholder) placeholder.style.display = 'flex';
-    if (offBadge)    offBadge.hidden = false;
+    if (offBadge) offBadge.hidden = false;
 
     if (micInterval) { clearInterval(micInterval); micInterval = null; }
     qsa('#isess-mic-viz span').forEach(s => s.style.height = '3px');
 
     // Switch panels
-    if (navbar)      navbar.style.display = 'none';
-    if (mobileNav)   mobileNav.style.display = 'none';
+    if (navbar) navbar.style.display = 'none';
+    if (mobileNav) mobileNav.style.display = 'none';
     if (pageWrapper) pageWrapper.style.display = 'none';
     if (interviewSession) {
       interviewSession.removeAttribute('hidden');
@@ -1252,7 +1252,7 @@ function addActivityEntry(color, text) {
     sessionState.currentIndex = index;
 
     const total = sessionState.questions.length;
-    const q     = sessionState.questions[index];
+    const q = sessionState.questions[index];
 
     // Reset textarea
     if (isessTextarea) {
@@ -1297,13 +1297,13 @@ function addActivityEntry(color, text) {
     // Update dot states
     qsa('.isess-dot-item').forEach((dot, i) => {
       dot.className = 'isess-dot-item';
-      if (i === index)       dot.classList.add('active');
-      else if (i < index)    dot.classList.add(sessionState.skips[i] ? 'skipped' : 'completed');
+      if (i === index) dot.classList.add('active');
+      else if (i < index) dot.classList.add(sessionState.skips[i] ? 'skipped' : 'completed');
     });
 
     // AI Speaking waveform
-    const aiWaveform    = qs('#isess-waveform');
-    const aiStatusText  = qs('#isess-ai-status-text');
+    const aiWaveform = qs('#isess-waveform');
+    const aiStatusText = qs('#isess-ai-status-text');
     if (aiWaveform) {
       aiWaveform.classList.add('speaking');
       if (aiStatusText) aiStatusText.textContent = 'AI Recruiter speakingâ€¦';
@@ -1324,10 +1324,10 @@ function addActivityEntry(color, text) {
 
     sessionState.timerSecondsRemaining = 90;
     const totalDuration = 90;
-    const dashArray     = 150.79;
+    const dashArray = 150.79;
 
-    const timerVal  = qs('#isess-timer-val');
-    const ringProg  = qs('#isess-ring-prog');
+    const timerVal = qs('#isess-timer-val');
+    const ringProg = qs('#isess-ring-prog');
 
     function updateTimerUI() {
       const min = Math.floor(sessionState.timerSecondsRemaining / 60);
@@ -1351,10 +1351,10 @@ function addActivityEntry(color, text) {
         const typedText = isessTextarea ? isessTextarea.value.trim() : '';
         if (typedText) {
           sessionState.answers[sessionState.currentIndex] = typedText;
-          sessionState.skips[sessionState.currentIndex]   = false;
+          sessionState.skips[sessionState.currentIndex] = false;
         } else {
           sessionState.answers[sessionState.currentIndex] = '';
-          sessionState.skips[sessionState.currentIndex]   = true;
+          sessionState.skips[sessionState.currentIndex] = true;
         }
         if (sessionState.currentIndex + 1 < sessionState.questions.length) {
           loadQuestion(sessionState.currentIndex + 1);
@@ -1372,11 +1372,11 @@ function addActivityEntry(color, text) {
     disableMic();
     if (sessionState.timerInterval) clearInterval(sessionState.timerInterval);
 
-    const idx    = sessionState.currentIndex;
+    const idx = sessionState.currentIndex;
     const answer = isessTextarea ? isessTextarea.value.trim() : '';
 
     sessionState.answers[idx] = answer;
-    sessionState.skips[idx]   = false;
+    sessionState.skips[idx] = false;
 
     // â”€â”€ Evaluate via backend if online â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (sessionState.isBackendOnline && sessionState.sessionId) {
@@ -1389,7 +1389,7 @@ function addActivityEntry(color, text) {
             is_skipped: false
           });
           sessionState.evaluations[idx] = {
-            score:    evalResult.score || 0,
+            score: evalResult.score || 0,
             feedback: evalResult.feedback || ''
           };
         } catch (err) {
@@ -1410,7 +1410,7 @@ function addActivityEntry(color, text) {
 
     const idx = sessionState.currentIndex;
     sessionState.answers[idx] = '';
-    sessionState.skips[idx]   = true;
+    sessionState.skips[idx] = true;
 
     // Record skipped answer in backend
     if (sessionState.isBackendOnline && sessionState.sessionId) {
@@ -1418,7 +1418,7 @@ function addActivityEntry(color, text) {
       if (qId) {
         apiPost(`/api/questions/${qId}/evaluate`, { text: '', is_skipped: true })
           .then(res => { sessionState.evaluations[idx] = { score: 0, feedback: 'Question skipped.' }; })
-          .catch(() => {});
+          .catch(() => { });
       }
     }
 
@@ -1448,17 +1448,17 @@ function addActivityEntry(color, text) {
 
     // Switch to complete panel immediately with basic stats
     if (interviewSession) { interviewSession.setAttribute('hidden', ''); interviewSession.style.display = 'none'; }
-    if (sessionComplete)  { sessionComplete.removeAttribute('hidden'); sessionComplete.style.display = ''; }
+    if (sessionComplete) { sessionComplete.removeAttribute('hidden'); sessionComplete.style.display = ''; }
 
     // â”€â”€ Basic stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const total   = sessionState.questions.length;
-    let answered  = 0;
-    let skipped   = 0;
+    const total = sessionState.questions.length;
+    let answered = 0;
+    let skipped = 0;
     sessionState.skips.forEach(s => s ? skipped++ : answered++);
 
-    const elapsedMs      = new Date() - sessionState.startTime;
-    const totalSecs      = Math.floor(elapsedMs / 1000);
-    const timeTakenStr   = `${Math.floor(totalSecs / 60)}m ${totalSecs % 60}s`;
+    const elapsedMs = new Date() - sessionState.startTime;
+    const totalSecs = Math.floor(elapsedMs / 1000);
+    const timeTakenStr = `${Math.floor(totalSecs / 60)}m ${totalSecs % 60}s`;
 
     // Calculate local score from evaluations (AI scores) or simple ratio
     let aiScorePct = 0;
@@ -1475,20 +1475,20 @@ function addActivityEntry(color, text) {
     const scompleteCatLabel = qs('#scomplete-cat-label');
     if (scompleteCatLabel) scompleteCatLabel.textContent = window.currentInterviewLabel;
 
-    const answeredEl  = qs('#scomplete-answered');
-    const skippedEl   = qs('#scomplete-skipped');
+    const answeredEl = qs('#scomplete-answered');
+    const skippedEl = qs('#scomplete-skipped');
     const timeTakenEl = qs('#scomplete-time-taken');
-    const scoreEl     = qs('#scomplete-score');
-    const progFill    = qs('#scomplete-prog-fill');
-    const progPct     = qs('#scomplete-prog-pct');
+    const scoreEl = qs('#scomplete-score');
+    const progFill = qs('#scomplete-prog-fill');
+    const progPct = qs('#scomplete-prog-pct');
     const completeMsg = qs('#scomplete-message');
 
-    if (answeredEl)  answeredEl.textContent  = answered;
-    if (skippedEl)   skippedEl.textContent   = skipped;
+    if (answeredEl) answeredEl.textContent = answered;
+    if (skippedEl) skippedEl.textContent = skipped;
     if (timeTakenEl) timeTakenEl.textContent = timeTakenStr;
-    if (scoreEl)     scoreEl.textContent     = `${aiScorePct}%`;
-    if (progFill)    progFill.style.width    = `${aiScorePct}%`;
-    if (progPct)     progPct.textContent     = `${aiScorePct}% Score`;
+    if (scoreEl) scoreEl.textContent = `${aiScorePct}%`;
+    if (progFill) progFill.style.width = `${aiScorePct}%`;
+    if (progPct) progPct.textContent = `${aiScorePct}% Score`;
 
     if (completeMsg) {
       if (aiScorePct >= 80) {
@@ -1505,30 +1505,30 @@ function addActivityEntry(color, text) {
 
     // â”€â”€ Persist to localStorage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const sessionRecord = {
-      id:            sessionState.sessionId || Date.now(),
-      date:          new Date().toISOString(),
-      category:      sessionState.activeCategory,
+      id: sessionState.sessionId || Date.now(),
+      date: new Date().toISOString(),
+      category: sessionState.activeCategory,
       categoryLabel: window.currentInterviewLabel || 'Interview',
-      year:          sessionState.activeYear,
-      branch:        sessionState.activeBranch,
-      domain:        sessionState.activeDomain,
-      subjects:      (sessionState.activeSubjects || []).slice(),
+      year: sessionState.activeYear,
+      branch: sessionState.activeBranch,
+      domain: sessionState.activeDomain,
+      subjects: (sessionState.activeSubjects || []).slice(),
       answered, skipped, total,
-      scorePct:      aiScorePct,
-      timeTaken:     timeTakenStr,
-      totalSeconds:  totalSecs
+      scorePct: aiScorePct,
+      timeTaken: timeTakenStr,
+      totalSeconds: totalSecs
     };
     const updatedStats = HireMindStore.saveSession(sessionRecord);
     const displayStats = HireMindStore.computeDisplayStats(updatedStats);
 
     // Refresh dashboard counters
     const valTotal = qs('#val-total');
-    const valBest  = qs('#val-best');
-    const valAvg   = qs('#val-avg');
+    const valBest = qs('#val-best');
+    const valAvg = qs('#val-avg');
     const valHours = qs('#val-hours');
     if (valTotal) valTotal.textContent = String(displayStats.totalInterviews);
-    if (valBest)  valBest.textContent  = displayStats.bestScore + '%';
-    if (valAvg)   valAvg.textContent   = displayStats.avgScore  + '%';
+    if (valBest) valBest.textContent = displayStats.bestScore + '%';
+    if (valAvg) valAvg.textContent = displayStats.avgScore + '%';
     if (valHours) valHours.textContent = displayStats.practiceHours + 'h';
 
     // â”€â”€ Fetch AI Report from backend (async, updates UI when done) â”€
@@ -1544,14 +1544,14 @@ function addActivityEntry(color, text) {
     reviewList.innerHTML = '';
 
     sessionState.questions.forEach((q, i) => {
-      const answer    = (sessionState.answers[i] || '').trim();
+      const answer = (sessionState.answers[i] || '').trim();
       const isSkipped = sessionState.skips[i] === true || answer === '';
-      const evalData  = sessionState.evaluations[i];
-      const hasEval   = evalData && sessionState.isBackendOnline;
+      const evalData = sessionState.evaluations[i];
+      const hasEval = evalData && sessionState.isBackendOnline;
 
       const badgeClass = isSkipped ? 'skipped' : 'answered';
-      const badgeText  = isSkipped ? 'Skipped'  : 'Answered';
-      const idxStr     = `Question ${i + 1 < 10 ? '0' : ''}${i + 1}`;
+      const badgeText = isSkipped ? 'Skipped' : 'Answered';
+      const idxStr = `Question ${i + 1 < 10 ? '0' : ''}${i + 1}`;
 
       const answerHtml = isSkipped
         ? `<div class="scomplete-review-answer-box skipped">No response provided (Skipped or Timed out).</div>`
@@ -1636,8 +1636,8 @@ function addActivityEntry(color, text) {
         .filter(l => l.length > 3);
     };
 
-    const strengthLines  = parseBullets(report.strengths);
-    const weaknessLines  = parseBullets(report.weaknesses);
+    const strengthLines = parseBullets(report.strengths);
+    const weaknessLines = parseBullets(report.weaknesses);
 
     const strengthHtml = strengthLines.map(s =>
       `<li><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(s)}</li>`
@@ -1676,17 +1676,17 @@ function addActivityEntry(color, text) {
 
   /* â”€â”€ CAMERA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   async function toggleCamera() {
-    const camVideo    = qs('#isess-cam-video');
+    const camVideo = qs('#isess-cam-video');
     const placeholder = qs('#isess-cam-placeholder');
-    const offBadge    = qs('#isess-cam-off-badge');
+    const offBadge = qs('#isess-cam-off-badge');
 
     if (!sessionState.isCamOn) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         sessionState.mediaStream = stream;
-        if (camVideo)    { camVideo.srcObject = stream; camVideo.style.display = 'block'; }
+        if (camVideo) { camVideo.srcObject = stream; camVideo.style.display = 'block'; }
         if (placeholder) placeholder.style.display = 'none';
-        if (offBadge)    offBadge.hidden = true;
+        if (offBadge) offBadge.hidden = true;
         sessionState.isCamOn = true;
         if (isessCamBtn) isessCamBtn.classList.remove('off');
       } catch (err) {
@@ -1698,9 +1698,9 @@ function addActivityEntry(color, text) {
       }
     } else {
       if (sessionState.mediaStream) sessionState.mediaStream.getVideoTracks().forEach(t => t.stop());
-      if (camVideo)    { camVideo.srcObject = null; camVideo.style.display = 'none'; }
+      if (camVideo) { camVideo.srcObject = null; camVideo.style.display = 'none'; }
       if (placeholder) placeholder.style.display = 'flex';
-      if (offBadge)    offBadge.hidden = false;
+      if (offBadge) offBadge.hidden = false;
       sessionState.isCamOn = false;
       if (isessCamBtn) isessCamBtn.classList.add('off');
     }
@@ -1714,9 +1714,9 @@ function addActivityEntry(color, text) {
 
     if (!sessionState.recognition) {
       sessionState.recognition = new SpeechRecognition();
-      sessionState.recognition.continuous      = true;
-      sessionState.recognition.interimResults  = true;
-      sessionState.recognition.lang            = 'en-US';
+      sessionState.recognition.continuous = true;
+      sessionState.recognition.interimResults = true;
+      sessionState.recognition.lang = 'en-US';
 
       sessionState.recognition.onstart = () => { sessionState.isRecognitionActive = true; };
 
@@ -1742,14 +1742,14 @@ function addActivityEntry(color, text) {
         if (sessionState.isSpeechRestarting) {
           sessionState.isSpeechRestarting = false;
           if (isessTextarea) sessionState.preSpeechText = isessTextarea.value.trim();
-          try { sessionState.recognition.start(); } catch (err) {}
+          try { sessionState.recognition.start(); } catch (err) { }
         }
       };
     }
 
     if (!sessionState.isRecognitionActive) {
       if (isessTextarea) sessionState.preSpeechText = isessTextarea.value.trim();
-      try { sessionState.recognition.start(); } catch (err) {}
+      try { sessionState.recognition.start(); } catch (err) { }
     }
   }
 
@@ -1810,11 +1810,11 @@ function addActivityEntry(color, text) {
   }
 
   /* â”€â”€ ACTION BUTTON BINDINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  if (isessEndBtn)  isessEndBtn.addEventListener('click',  endSession);
+  if (isessEndBtn) isessEndBtn.addEventListener('click', endSession);
   if (isessSkipBtn) isessSkipBtn.addEventListener('click', skipQuestion);
   if (isessNextBtn) isessNextBtn.addEventListener('click', nextQuestion);
-  if (isessMicBtn)  isessMicBtn.addEventListener('click',  toggleMic);
-  if (isessCamBtn)  isessCamBtn.addEventListener('click',  toggleCamera);
+  if (isessMicBtn) isessMicBtn.addEventListener('click', toggleMic);
+  if (isessCamBtn) isessCamBtn.addEventListener('click', toggleCamera);
 
   if (scompleteRetryBtn) {
     scompleteRetryBtn.addEventListener('click', () => {
@@ -1832,8 +1832,8 @@ function addActivityEntry(color, text) {
   if (scompleteDashboardBtn) {
     scompleteDashboardBtn.addEventListener('click', () => {
       if (sessionComplete) { sessionComplete.setAttribute('hidden', ''); sessionComplete.style.display = 'none'; }
-      if (navbar)      navbar.style.display = '';
-      if (mobileNav)   mobileNav.style.display = '';
+      if (navbar) navbar.style.display = '';
+      if (mobileNav) mobileNav.style.display = '';
       if (pageWrapper) pageWrapper.style.display = '';
     });
   }
