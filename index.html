@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HireMind — AI-powered virtual interview preparation platform. Practice with an AI recruiter, get real-time feedback, and land your dream job." />
+  <meta name="theme-color" content="#020409" />
+  <title>HireMind — AI Interview Preparation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="navbar-inner">
+
+      <!-- Logo -->
+      <a class="logo" href="#" id="nav-logo" aria-label="HireMind Home">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00d4ff"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+            <!-- Brain outline (simplified) -->
+            <path d="M20 5 C12 5 6 10 6 17 C6 21 8 24 11 26 L11 34 L29 34 L29 26 C32 24 34 21 34 17 C34 10 28 5 20 5 Z"
+                  stroke="url(#logoGrad)" stroke-width="1.5" fill="none" opacity="0.8"/>
+            <!-- Neural nodes -->
+            <circle cx="14" cy="16" r="2" fill="url(#logoGrad)" opacity="0.9"/>
+            <circle cx="20" cy="14" r="2" fill="url(#logoGrad)" opacity="0.9"/>
+            <circle cx="26" cy="16" r="2" fill="url(#logoGrad)" opacity="0.9"/>
+            <circle cx="17" cy="22" r="1.5" fill="url(#logoGrad)" opacity="0.7"/>
+            <circle cx="23" cy="22" r="1.5" fill="url(#logoGrad)" opacity="0.7"/>
+            <!-- Connections -->
+            <line x1="14" y1="16" x2="20" y2="14" stroke="url(#logoGrad)" stroke-width="1" opacity="0.5"/>
+            <line x1="20" y1="14" x2="26" y2="16" stroke="url(#logoGrad)" stroke-width="1" opacity="0.5"/>
+            <line x1="14" y1="16" x2="17" y2="22" stroke="url(#logoGrad)" stroke-width="1" opacity="0.5"/>
+            <line x1="26" y1="16" x2="23" y2="22" stroke="url(#logoGrad)" stroke-width="1" opacity="0.5"/>
+            <line x1="17" y1="22" x2="23" y2="22" stroke="url(#logoGrad)" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <span class="logo-text">Hire<span>Mind</span></span>
+      </a>
+
+      <!-- Nav Links -->
+      <nav aria-label="Primary navigation">
+        <ul class="nav-links" role="list">
+          <li>
+            <a href="#" class="active" id="nav-dashboard" aria-current="page">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#" id="nav-interviews">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Interviews
+            </a>
+          </li>
+          <li>
+            <a href="#" id="nav-history">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              History
+            </a>
+          </li>
+          <li>
+            <a href="#" id="nav-profile">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              Profile
+            </a>
+          </li>
+          <li>
+            <a href="#" id="nav-settings">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <button class="nav-notification-btn" id="nav-notif-btn" aria-label="Notifications" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notif-dot" aria-hidden="true"></span>
+        </button>
+        <div class="nav-avatar" id="nav-avatar" role="button" tabindex="0" aria-label="User profile" title="User profile">HM</div>
+        <button class="hamburger" id="hamburger-btn" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+    <a href="#" class="active" id="mob-dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="#" id="mob-interviews">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Interviews
+    </a>
+    <a href="#" id="mob-history">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      History
+    </a>
+    <a href="#" id="mob-profile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </a>
+    <a href="#" id="mob-settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE WRAPPER
+  ══════════════════════════════════════ -->
+  <div class="page-wrapper">
+    <main class="main-content" id="main-content" role="main">
+
+      <!-- ── Dashboard Header ── -->
+      <section class="dashboard-header" aria-label="Dashboard overview">
+        <div class="dashboard-greeting">
+          <h1>Welcome back to <span class="gradient-text">HireMind</span></h1>
+          <p>Your AI-powered interview coach is ready &mdash; let&rsquo;s ace your next interview.</p>
+        </div>
+        <div class="header-badge" aria-label="AI status: ready">
+          <span class="header-badge-dot" aria-hidden="true"></span>
+          AI Ready
+        </div>
+      </section>
+
+      <!-- ── Stats Bar ── -->
+      <section class="status-bar" aria-label="Interview statistics">
+
+        <div class="status-pill" id="stat-total">
+          <div class="status-pill-icon cyan" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="status-pill-info">
+            <span class="status-pill-label">Total Interviews</span>
+            <span class="status-pill-value stat-number" id="val-total">0</span>
+          </div>
+        </div>
+
+        <div class="status-pill" id="stat-best">
+          <div class="status-pill-icon green" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div class="status-pill-info">
+            <span class="status-pill-label">Best Score</span>
+            <span class="status-pill-value stat-number" id="val-best">0%</span>
+          </div>
+        </div>
+
+        <div class="status-pill" id="stat-avg">
+          <div class="status-pill-icon violet" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <div class="status-pill-info">
+            <span class="status-pill-label">Average Score</span>
+            <span class="status-pill-value stat-number" id="val-avg">0%</span>
+          </div>
+        </div>
+
+        <div class="status-pill" id="stat-hours">
+          <div class="status-pill-icon blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="status-pill-info">
+            <span class="status-pill-label">Practice Hours</span>
+            <span class="status-pill-value stat-number" id="val-hours">0h</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── Tech Ticker ── -->
+      <div class="tech-ticker" aria-hidden="true">
+        <div class="tech-ticker-inner" id="ticker-inner">
+          <span class="ticker-item"><span class="ticker-dot"></span>AI-Powered Feedback</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Voice Recognition</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Behavioral Analysis</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Resume Screening</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Real-Time Coaching</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>STAR Method Training</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Company-Specific Prep</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Confidence Scoring</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Interview Simulation</span>
+          <!-- duplicate for loop -->
+          <span class="ticker-item"><span class="ticker-dot"></span>AI-Powered Feedback</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Voice Recognition</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Behavioral Analysis</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Resume Screening</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Real-Time Coaching</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>STAR Method Training</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Company-Specific Prep</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Confidence Scoring</span>
+          <span class="ticker-item"><span class="ticker-dot"></span>Interview Simulation</span>
+        </div>
+      </div>
+
+      <div class="glow-divider" aria-hidden="true"></div>
+
+      <!-- ══════════════════════════════════════
+           MAIN WORKSPACE GRID
+      ══════════════════════════════════════ -->
+      <div class="workspace-grid">
+
+        <!-- ── LEFT: Start Interview Panel ── -->
+        <article class="glass-panel main-panel" id="main-workspace-panel" aria-label="Start a new interview">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="panel-title-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+                </svg>
+              </div>
+              Start New Interview
+            </div>
+            <span class="panel-badge cyan">5 Categories</span>
+          </div>
+
+          <div class="panel-body interview-panel-body">
+
+            <!-- Hero CTA -->
+            <div class="interview-hero">
+              <div class="interview-hero-icon" aria-hidden="true">
+                <div class="hero-ring hero-ring-outer"></div>
+                <div class="hero-ring hero-ring-mid"></div>
+                <div class="hero-icon-inner">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="interview-hero-text">
+                <h2>Choose Your Interview Type</h2>
+                <p>Select a category below to start a tailored AI-powered mock interview session.</p>
+              </div>
+            </div>
+
+            <!-- Category Cards Grid -->
+            <div class="category-grid" role="list" aria-label="Interview categories">
+
+              <!-- HR Interview -->
+              <button class="category-card" id="cat-hr" role="listitem" data-category="hr" aria-label="Start HR Interview">
+                <div class="category-card-glow"></div>
+                <div class="category-icon-wrap cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="category-info">
+                  <span class="category-name">HR Interview</span>
+                  <span class="category-desc">Behavioral &amp; cultural fit questions</span>
+                </div>
+                <div class="category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+                <div class="category-tag">Most Popular</div>
+              </button>
+
+              <!-- Software Developer -->
+              <button class="category-card" id="cat-sde" role="listitem" data-category="sde" aria-label="Start Software Developer Interview">
+                <div class="category-card-glow"></div>
+                <div class="category-icon-wrap violet">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                </div>
+                <div class="category-info">
+                  <span class="category-name">Software Developer</span>
+                  <span class="category-desc">DSA, system design &amp; coding rounds</span>
+                </div>
+                <div class="category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Web Developer -->
+              <button class="category-card" id="cat-web" role="listitem" data-category="web" aria-label="Start Web Developer Interview">
+                <div class="category-card-glow"></div>
+                <div class="category-icon-wrap blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                </div>
+                <div class="category-info">
+                  <span class="category-name">Web Developer</span>
+                  <span class="category-desc">HTML, CSS, JS, frameworks &amp; APIs</span>
+                </div>
+                <div class="category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Data Analyst -->
+              <button class="category-card" id="cat-data" role="listitem" data-category="data" aria-label="Start Data Analyst Interview">
+                <div class="category-card-glow"></div>
+                <div class="category-icon-wrap green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                    <path d="M3 20h18"/>
+                  </svg>
+                </div>
+                <div class="category-info">
+                  <span class="category-name">Data Analyst</span>
+                  <span class="category-desc">SQL, Python, stats &amp; visualization</span>
+                </div>
+                <div class="category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Custom Interview -->
+              <button class="category-card category-card-custom" id="cat-custom" role="listitem" data-category="custom" aria-label="Start Custom Interview">
+                <div class="category-card-glow custom-glow"></div>
+                <div class="category-icon-wrap purple-grad">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </div>
+                <div class="category-info">
+                  <span class="category-name">Custom Interview</span>
+                  <span class="category-desc">Build your own question set &amp; difficulty</span>
+                </div>
+                <div class="category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+                <div class="category-tag custom-tag">New</div>
+              </button>
+
+            </div><!-- end category-grid -->
+          </div>
+        </article>
+
+        <!-- ── RIGHT: Side Column ── -->
+        <aside class="side-column" aria-label="Dashboard sidebar">
+
+          <!-- Interview Features Panel -->
+          <article class="glass-panel" id="interview-features-panel" aria-label="Interview features">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                Interview Features
+              </div>
+              <span class="panel-badge violet">5 Tools</span>
+            </div>
+            <div class="panel-body">
+              <ul class="ai-status-list" role="list">
+
+                <li class="ai-status-item" id="feat-voice">
+                  <span class="ai-indicator active" aria-label="Available"></span>
+                  <span class="ai-status-label">Voice Interview</span>
+                  <span class="ai-status-badge green">Live</span>
+                </li>
+
+                <li class="ai-status-item" id="feat-avatar">
+                  <span class="ai-indicator active" aria-label="Available"></span>
+                  <span class="ai-status-label">AI Recruiter Avatar</span>
+                  <span class="ai-status-badge green">Live</span>
+                </li>
+
+                <li class="ai-status-item" id="feat-resume">
+                  <span class="ai-indicator idle" aria-label="Available"></span>
+                  <span class="ai-status-label">Resume Analysis</span>
+                  <span class="ai-status-badge cyan">Ready</span>
+                </li>
+
+                <li class="ai-status-item" id="feat-tracking">
+                  <span class="ai-indicator active" aria-label="Available"></span>
+                  <span class="ai-status-label">Performance Tracking</span>
+                  <span class="ai-status-badge green">Live</span>
+                </li>
+
+                <li class="ai-status-item" id="feat-company">
+                  <span class="ai-indicator offline" aria-label="Coming soon"></span>
+                  <span class="ai-status-label">Company-Specific Prep</span>
+                  <span class="ai-status-badge muted">Soon</span>
+                </li>
+
+              </ul>
+            </div>
+          </article>
+
+          <!-- Quick Navigation -->
+          <article class="glass-panel" id="quick-nav-panel" aria-label="Quick navigation">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+                  </svg>
+                </div>
+                Quick Access
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="quick-nav-grid" role="list">
+                <a href="#" class="quick-nav-item" id="qnav-new-interview" role="listitem" aria-label="New Interview">
+                  <div class="quick-nav-icon cyan" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+                    </svg>
+                  </div>
+                  <span class="quick-nav-label">New Interview</span>
+                </a>
+                <a href="#" class="quick-nav-item" id="qnav-history" role="listitem" aria-label="View History">
+                  <div class="quick-nav-icon blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  </div>
+                  <span class="quick-nav-label">History</span>
+                </a>
+                <a href="#" class="quick-nav-item" id="qnav-resume" role="listitem" aria-label="Upload Resume">
+                  <div class="quick-nav-icon violet" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                  </div>
+                  <span class="quick-nav-label">Upload Resume</span>
+                </a>
+                <a href="#" class="quick-nav-item" id="qnav-profile" role="listitem" aria-label="My Profile">
+                  <div class="quick-nav-icon green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  <span class="quick-nav-label">My Profile</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </aside>
+
+        <!-- ── Activity Feed (full-width bottom) ── -->
+        <article class="glass-panel activity-panel" id="activity-panel" aria-label="Recent activity">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="panel-title-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              Recent Activity
+            </div>
+            <span class="panel-badge cyan">Live</span>
+          </div>
+          <div class="panel-body">
+            <div class="activity-timeline" role="feed" aria-label="Activity timeline" aria-live="polite">
+
+              <div class="activity-item" id="act-1">
+                <div class="activity-dot-col" aria-hidden="true">
+                  <span class="activity-dot cyan"></span>
+                  <span class="activity-line"></span>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text"><strong>HireMind ready</strong> — Dashboard loaded. AI interview engine is online and ready for your session.</p>
+                  <span class="activity-time">Just now</span>
+                </div>
+              </div>
+
+              <div class="activity-item" id="act-2">
+                <div class="activity-dot-col" aria-hidden="true">
+                  <span class="activity-dot green"></span>
+                  <span class="activity-line"></span>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text"><strong>Voice Interview</strong> — Speech recognition module is active and calibrated for your microphone.</p>
+                  <span class="activity-time">2 sec ago</span>
+                </div>
+              </div>
+
+              <div class="activity-item" id="act-3">
+                <div class="activity-dot-col" aria-hidden="true">
+                  <span class="activity-dot violet"></span>
+                  <span class="activity-line"></span>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text"><strong>AI Recruiter Avatar</strong> — Personality model loaded. Ready to conduct your mock interview session.</p>
+                  <span class="activity-time">5 sec ago</span>
+                </div>
+              </div>
+
+              <div class="activity-item" id="act-4">
+                <div class="activity-dot-col" aria-hidden="true">
+                  <span class="activity-dot blue"></span>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text"><strong>HireMind v0.1.0</strong> — Platform initialized. Start a new interview to begin your preparation journey.</p>
+                  <span class="activity-time">10 sec ago</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </article>
+
+      </div><!-- end workspace-grid -->
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+      &copy; 2026 <span>HireMind</span> &mdash; AI-powered interview preparation &middot; All rights reserved
+    </footer>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ══════════════════════════════════════
+       INTERVIEW SETUP MODAL
+  ══════════════════════════════════════ -->
+  <div class="setup-overlay" id="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setup-modal-title" aria-describedby="setup-modal-desc" hidden>
+
+    <!-- Backdrop -->
+    <div class="setup-backdrop" id="setup-backdrop"></div>
+
+    <!-- Modal Panel -->
+    <div class="setup-modal" id="setup-modal">
+
+      <!-- Decorative glow rings -->
+      <div class="setup-glow-ring setup-glow-ring-1" aria-hidden="true"></div>
+      <div class="setup-glow-ring setup-glow-ring-2" aria-hidden="true"></div>
+
+      <!-- Modal Header -->
+      <div class="setup-header">
+        <div class="setup-header-left">
+          <!-- Category icon + label injected by JS -->
+          <div class="setup-category-chip" id="setup-category-chip">
+            <span class="setup-chip-dot" aria-hidden="true"></span>
+            <span id="setup-chip-label">HR Interview</span>
+          </div>
+          <h2 class="setup-title" id="setup-modal-title">Interview Setup</h2>
+          <p class="setup-subtitle" id="setup-modal-desc">Tell us about yourself so we can personalise your AI interview session.</p>
+        </div>
+        <button class="setup-close-btn" id="setup-close-btn" aria-label="Close interview setup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Step Progress Bar -->
+      <div class="setup-progress" aria-label="Setup progress" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+        <div class="setup-progress-track">
+          <div class="setup-progress-fill" id="setup-progress-fill"></div>
+        </div>
+        <div class="setup-steps-row">
+          <div class="setup-step active" id="step-ind-1" data-step="1">
+            <div class="setup-step-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7L9 18l-5-5"/></svg>
+            </div>
+            <span class="setup-step-label">Branch</span>
+          </div>
+          <div class="setup-step" id="step-ind-2" data-step="2">
+            <div class="setup-step-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7L9 18l-5-5"/></svg>
+            </div>
+            <span class="setup-step-label">Year</span>
+          </div>
+          <div class="setup-step" id="step-ind-3" data-step="3">
+            <div class="setup-step-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7L9 18l-5-5"/></svg>
+            </div>
+            <span class="setup-step-label">Domain</span>
+          </div>
+          <div class="setup-step" id="step-ind-4" data-step="4">
+            <div class="setup-step-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7L9 18l-5-5"/></svg>
+            </div>
+            <span class="setup-step-label">Subjects</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Body -->
+      <div class="setup-form" id="setup-form">
+
+        <!-- ── Step 1: Branch ── -->
+        <div class="setup-step-panel active" id="panel-1" data-panel="1">
+          <div class="setup-field">
+            <label class="setup-label" for="field-branch">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              Select Your Branch
+            </label>
+            <div class="setup-select-wrap">
+              <select class="setup-select" id="field-branch" name="branch" aria-required="true">
+                <option value="" disabled selected>-- Choose your branch --</option>
+                <option value="cse">Computer Science &amp; Engineering (CSE)</option>
+                <option value="it">Information Technology (IT)</option>
+                <option value="ece">Electronics &amp; Communication (ECE)</option>
+                <option value="eee">Electrical &amp; Electronics (EEE)</option>
+                <option value="mech">Mechanical Engineering</option>
+                <option value="civil">Civil Engineering</option>
+                <option value="aiml">AI &amp; Machine Learning (AI/ML)</option>
+                <option value="ds">Data Science</option>
+                <option value="cyber">Cybersecurity</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="setup-select-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+            <p class="setup-field-hint" id="branch-error" role="alert" aria-live="assertive"></p>
+          </div>
+        </div>
+
+        <!-- ── Step 2: Academic Year ── -->
+        <div class="setup-step-panel" id="panel-2" data-panel="2">
+          <div class="setup-field">
+            <label class="setup-label" for="field-year">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Academic Year
+            </label>
+            <!-- Year selector as visual cards -->
+            <div class="year-grid" role="radiogroup" aria-label="Select academic year" id="year-grid">
+              <label class="year-card" for="yr-1">
+                <input type="radio" name="year" id="yr-1" value="1" class="year-radio" aria-label="1st Year" />
+                <div class="year-card-inner">
+                  <span class="year-num">1<sup>st</sup></span>
+                  <span class="year-text">Year</span>
+                  <span class="year-tag">Freshman</span>
+                </div>
+              </label>
+              <label class="year-card" for="yr-2">
+                <input type="radio" name="year" id="yr-2" value="2" class="year-radio" aria-label="2nd Year" />
+                <div class="year-card-inner">
+                  <span class="year-num">2<sup>nd</sup></span>
+                  <span class="year-text">Year</span>
+                  <span class="year-tag">Sophomore</span>
+                </div>
+              </label>
+              <label class="year-card" for="yr-3">
+                <input type="radio" name="year" id="yr-3" value="3" class="year-radio" aria-label="3rd Year" />
+                <div class="year-card-inner">
+                  <span class="year-num">3<sup>rd</sup></span>
+                  <span class="year-text">Year</span>
+                  <span class="year-tag">Junior</span>
+                </div>
+              </label>
+              <label class="year-card" for="yr-4">
+                <input type="radio" name="year" id="yr-4" value="4" class="year-radio" aria-label="4th Year" />
+                <div class="year-card-inner">
+                  <span class="year-num">4<sup>th</sup></span>
+                  <span class="year-text">Year</span>
+                  <span class="year-tag">Senior</span>
+                </div>
+              </label>
+            </div>
+            <p class="setup-field-hint" id="year-error" role="alert" aria-live="assertive"></p>
+          </div>
+        </div>
+
+        <!-- ── Step 3: Domain of Interest ── -->
+        <div class="setup-step-panel" id="panel-3" data-panel="3">
+          <div class="setup-field">
+            <label class="setup-label" for="field-domain">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/>
+              </svg>
+              Domain of Interest
+            </label>
+            <div class="setup-select-wrap">
+              <select class="setup-select" id="field-domain" name="domain" aria-required="true">
+                <option value="" disabled selected>-- Choose your domain --</option>
+                <optgroup label="Software & Development">
+                  <option value="web-dev">Web Development</option>
+                  <option value="mobile-dev">Mobile App Development</option>
+                  <option value="backend">Backend Development</option>
+                  <option value="fullstack">Full Stack Development</option>
+                  <option value="devops">DevOps &amp; Cloud</option>
+                </optgroup>
+                <optgroup label="Data & AI">
+                  <option value="data-science">Data Science</option>
+                  <option value="ai-ml">Artificial Intelligence &amp; ML</option>
+                  <option value="data-analyst">Data Analytics</option>
+                  <option value="nlp">Natural Language Processing</option>
+                </optgroup>
+                <optgroup label="Security & Infrastructure">
+                  <option value="cybersec">Cybersecurity</option>
+                  <option value="networking">Networking &amp; Systems</option>
+                  <option value="cloud">Cloud Computing</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="embedded">Embedded Systems</option>
+                  <option value="game-dev">Game Development</option>
+                  <option value="product">Product Management</option>
+                  <option value="hr">Human Resources</option>
+                </optgroup>
+              </select>
+              <div class="setup-select-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+            <p class="setup-field-hint" id="domain-error" role="alert" aria-live="assertive"></p>
+          </div>
+        </div>
+
+        <!-- ── Step 4: Subjects ── -->
+        <div class="setup-step-panel" id="panel-4" data-panel="4">
+          <div class="setup-field">
+            <label class="setup-label" for="subject-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              Subjects You're Confident In
+              <span class="setup-label-hint">(Select all that apply)</span>
+            </label>
+
+            <!-- Search filter -->
+            <div class="subject-search-wrap">
+              <svg class="subject-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" class="subject-search" id="subject-search" placeholder="Filter subjects…" autocomplete="off" aria-label="Filter subjects" aria-controls="subjects-grid" />
+            </div>
+
+            <!-- Subject tag pills -->
+            <div class="subjects-grid" id="subjects-grid" role="group" aria-label="Subject selection">
+              <!-- Populated by JS based on branch/domain -->
+            </div>
+
+            <!-- Selected count -->
+            <div class="subjects-summary" id="subjects-summary">
+              <span class="subjects-count-label">Selected:</span>
+              <span class="subjects-count-val" id="subjects-count">0 subjects</span>
+              <button type="button" class="subjects-clear-btn" id="subjects-clear-btn" aria-label="Clear all selected subjects">Clear all</button>
+            </div>
+            <p class="setup-field-hint" id="subjects-error" role="alert" aria-live="assertive"></p>
+          </div>
+        </div>
+
+      </div><!-- end setup-form -->
+
+      <!-- Modal Footer: Navigation Buttons -->
+      <div class="setup-footer">
+        <button type="button" class="setup-btn-back" id="setup-btn-back" aria-label="Go to previous step" style="visibility:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Back
+        </button>
+
+        <div class="setup-step-counter" aria-live="polite">
+          Step <span id="setup-current-step">1</span> of 4
+        </div>
+
+        <button type="button" class="setup-btn-next" id="setup-btn-next" aria-label="Go to next step">
+          Next
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+
+        <button type="button" class="setup-btn-start" id="setup-btn-start" hidden aria-label="Begin interview session">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+          </svg>
+          Begin Interview
+        </button>
+      </div>
+
+    </div><!-- end setup-modal -->
+  </div><!-- end setup-overlay -->
+
+  <!-- ══════════════════════════════════════
+       INTERVIEW SESSION SCREEN
+  ══════════════════════════════════════ -->
+  <div id="interview-session" class="interview-session" hidden>
+
+    <!-- Ambient background -->
+    <div class="isess-bg" aria-hidden="true">
+      <div class="isess-bg-orb isess-bg-orb-1"></div>
+      <div class="isess-bg-orb isess-bg-orb-2"></div>
+    </div>
+
+    <!-- ── Top Bar ── -->
+    <header class="isess-topbar">
+      <div class="isess-topbar-inner">
+
+        <!-- Logo -->
+        <div class="isess-logo">
+          <div class="logo-icon" style="width:30px;height:30px;">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="isessLogoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+              <path d="M20 5 C12 5 6 10 6 17 C6 21 8 24 11 26 L11 34 L29 34 L29 26 C32 24 34 21 34 17 C34 10 28 5 20 5 Z" stroke="url(#isessLogoGrad)" stroke-width="1.5" fill="none" opacity="0.8"/>
+              <circle cx="14" cy="16" r="2" fill="url(#isessLogoGrad)" opacity="0.9"/><circle cx="20" cy="14" r="2" fill="url(#isessLogoGrad)" opacity="0.9"/><circle cx="26" cy="16" r="2" fill="url(#isessLogoGrad)" opacity="0.9"/>
+              <circle cx="17" cy="22" r="1.5" fill="url(#isessLogoGrad)" opacity="0.7"/><circle cx="23" cy="22" r="1.5" fill="url(#isessLogoGrad)" opacity="0.7"/>
+              <line x1="14" y1="16" x2="20" y2="14" stroke="url(#isessLogoGrad)" stroke-width="1" opacity="0.5"/><line x1="20" y1="14" x2="26" y2="16" stroke="url(#isessLogoGrad)" stroke-width="1" opacity="0.5"/>
+              <line x1="14" y1="16" x2="17" y2="22" stroke="url(#isessLogoGrad)" stroke-width="1" opacity="0.5"/><line x1="26" y1="16" x2="23" y2="22" stroke="url(#isessLogoGrad)" stroke-width="1" opacity="0.5"/>
+              <line x1="17" y1="22" x2="23" y2="22" stroke="url(#isessLogoGrad)" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <span class="logo-text" style="font-size:1rem;">Hire<span>Mind</span></span>
+        </div>
+
+        <!-- Category chip + Q counter -->
+        <div class="isess-session-info">
+          <div class="isess-cat-chip" id="isess-cat-chip">
+            <span class="isess-cat-dot" aria-hidden="true"></span>
+            <span id="isess-cat-label">HR Interview</span>
+          </div>
+          <span class="isess-q-counter" id="isess-q-counter" aria-live="polite">Question 1 of 7</span>
+        </div>
+
+        <!-- Countdown Timer Ring -->
+        <div class="isess-timer" role="timer" aria-label="Time remaining">
+          <svg class="isess-timer-svg" viewBox="0 0 56 56" aria-hidden="true">
+            <circle class="isess-ring-track" cx="28" cy="28" r="24"/>
+            <circle class="isess-ring-prog" id="isess-ring-prog" cx="28" cy="28" r="24"/>
+          </svg>
+          <span class="isess-timer-num" id="isess-timer-val">1:30</span>
+        </div>
+
+        <!-- End Session -->
+        <button class="isess-end-btn" id="isess-end-btn" aria-label="End interview session">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <span class="isess-end-label">End Session</span>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Progress Strip -->
+    <div class="isess-prog-strip" aria-hidden="true">
+      <div class="isess-prog-fill" id="isess-prog-fill"></div>
+    </div>
+
+    <!-- ── Video Stage ── -->
+    <div class="isess-video-stage">
+
+      <!-- ── AI Interviewer Panel ── -->
+      <div class="isess-panel isess-ai-panel" id="isess-ai-panel">
+
+        <!-- Visualization -->
+        <div class="isess-ai-viz" id="isess-ai-viz">
+          <div class="isess-ai-glow-ring isess-glow-ring-1" aria-hidden="true"></div>
+          <div class="isess-ai-glow-ring isess-glow-ring-2" aria-hidden="true"></div>
+          <div class="isess-ai-glow-ring isess-glow-ring-3" aria-hidden="true"></div>
+
+          <!-- Core avatar icon -->
+          <div class="isess-ai-core" id="isess-ai-core" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="aiCoreGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+              <path d="M20 5 C12 5 6 10 6 17 C6 21 8 24 11 26 L11 34 L29 34 L29 26 C32 24 34 21 34 17 C34 10 28 5 20 5 Z" stroke="url(#aiCoreGrad)" stroke-width="2" fill="rgba(0,212,255,0.05)"/>
+              <circle cx="14" cy="16" r="2.5" fill="url(#aiCoreGrad)"/><circle cx="20" cy="14" r="2.5" fill="url(#aiCoreGrad)"/><circle cx="26" cy="16" r="2.5" fill="url(#aiCoreGrad)"/>
+              <circle cx="17" cy="23" r="2" fill="url(#aiCoreGrad)" opacity="0.8"/><circle cx="23" cy="23" r="2" fill="url(#aiCoreGrad)" opacity="0.8"/>
+              <line x1="14" y1="16" x2="20" y2="14" stroke="url(#aiCoreGrad)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="20" y1="14" x2="26" y2="16" stroke="url(#aiCoreGrad)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="14" y1="16" x2="17" y2="23" stroke="url(#aiCoreGrad)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="26" y1="16" x2="23" y2="23" stroke="url(#aiCoreGrad)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="17" y1="23" x2="23" y2="23" stroke="url(#aiCoreGrad)" stroke-width="1.5" opacity="0.7"/>
+            </svg>
+          </div>
+
+          <!-- Audio waveform (animates when AI is "speaking") -->
+          <div class="isess-waveform" id="isess-waveform" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+
+          <!-- AI Status label -->
+          <div class="isess-ai-status-row">
+            <span class="isess-ai-status-dot" aria-hidden="true"></span>
+            <span class="isess-ai-status-text" id="isess-ai-status-text">AI Recruiter</span>
+          </div>
+        </div>
+
+        <!-- Question overlay at bottom of AI panel -->
+        <div class="isess-q-overlay">
+          <div class="isess-q-meta-row">
+            <span class="isess-q-num-tag" id="isess-q-num-tag">01 / 07</span>
+            <span class="isess-diff-pill" id="isess-diff-pill">Medium</span>
+            <span class="isess-topic-pill" id="isess-topic-pill">Behavioral</span>
+          </div>
+          <p class="isess-question-text" id="isess-question-text" aria-live="polite">
+            Tell me about yourself and your professional background.
+          </p>
+          <div class="isess-hint-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="isess-hint-text">Structure it: who you are, your experience, and what you're looking for.</span>
+          </div>
+        </div>
+
+        <!-- Panel name label -->
+        <div class="isess-panel-label">
+          <span class="isess-label-dot isess-label-dot-ai" aria-hidden="true"></span>
+          AI Recruiter
+        </div>
+
+      </div><!-- end ai-panel -->
+
+      <!-- ── User Camera Panel ── -->
+      <div class="isess-panel isess-user-panel" id="isess-user-panel">
+
+        <!-- Live camera video -->
+        <video class="isess-cam-video" id="isess-cam-video" autoplay muted playsinline></video>
+
+        <!-- Placeholder when camera is off -->
+        <div class="isess-cam-placeholder" id="isess-cam-placeholder">
+          <div class="isess-user-avatar-wrap">
+            <div class="isess-user-ring isess-user-ring-1" aria-hidden="true"></div>
+            <div class="isess-user-ring isess-user-ring-2" aria-hidden="true"></div>
+            <div class="isess-user-initials" id="isess-user-initials">HM</div>
+          </div>
+          <p class="isess-cam-off-label">Camera Off</p>
+          <p class="isess-cam-hint">Click 📷 below to enable your camera</p>
+        </div>
+
+        <!-- Mic activity visualizer (bottom-right of user panel) -->
+        <div class="isess-mic-viz" id="isess-mic-viz" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Camera-off status badge (top-right) -->
+        <div class="isess-cam-off-badge" id="isess-cam-off-badge" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
+            <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/><path d="M23 7l-7 5 7 5V7z"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+          Camera Off
+        </div>
+
+        <!-- Panel name label -->
+        <div class="isess-panel-label">
+          <span class="isess-label-dot isess-label-dot-user" aria-hidden="true"></span>
+          <span id="isess-user-label">You</span>
+        </div>
+
+      </div><!-- end user-panel -->
+
+    </div><!-- end video-stage -->
+
+    <!-- ── Answer Dock ── -->
+    <div class="isess-answer-dock">
+      <div class="isess-dock-inner">
+
+        <!-- Textarea -->
+        <div class="isess-answer-wrap">
+          <div class="isess-answer-top-bar">
+            <label class="isess-answer-label" for="isess-textarea">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="13" height="13">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+              Your Answer
+              <kbd class="isess-kbd">Ctrl+Enter</kbd>
+            </label>
+            <span class="isess-char-count" id="isess-char-count" aria-live="polite">0 / 1000</span>
+          </div>
+          <textarea
+            class="isess-textarea"
+            id="isess-textarea"
+            placeholder="Type your answer here… or enable your microphone to speak."
+            maxlength="1000"
+            aria-label="Your answer"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Controls -->
+        <div class="isess-controls">
+
+          <!-- Mic toggle -->
+          <button class="isess-ctrl-btn" id="isess-mic-btn" aria-label="Toggle microphone" title="Toggle Microphone">
+            <svg class="isess-icon-mic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            <svg class="isess-icon-mic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+
+          <!-- Camera toggle -->
+          <button class="isess-ctrl-btn" id="isess-cam-btn" aria-label="Toggle camera" title="Toggle Camera">
+            <svg class="isess-icon-cam-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+            <svg class="isess-icon-cam-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+
+          <div class="isess-dock-divider" aria-hidden="true"></div>
+
+          <!-- Question dot indicators -->
+          <div class="isess-dots-row" id="isess-dots-row" aria-label="Question progress" role="list"></div>
+
+          <div class="isess-dock-divider" aria-hidden="true"></div>
+
+          <!-- Skip -->
+          <button class="isess-skip-btn" id="isess-skip-btn" aria-label="Skip this question">Skip</button>
+
+          <!-- Next / Finish -->
+          <button class="isess-next-btn" id="isess-next-btn">
+            <span id="isess-next-label">Next Question</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+
+        </div>
+
+      </div>
+    </div><!-- end answer-dock -->
+
+  </div><!-- end interview-session -->
+
+
+  <!-- ══════════════════════════════════════
+       SESSION COMPLETE SCREEN
+  ══════════════════════════════════════ -->
+  <div id="session-complete" class="session-complete" hidden>
+
+    <div class="scomplete-bg" aria-hidden="true">
+      <div class="scomplete-orb scomplete-orb-1"></div>
+      <div class="scomplete-orb scomplete-orb-2"></div>
+    </div>
+
+    <div class="scomplete-card glass-panel">
+
+      <!-- Trophy visualization -->
+      <div class="scomplete-trophy" aria-hidden="true">
+        <div class="scomplete-trophy-ring scomplete-ring-outer"></div>
+        <div class="scomplete-trophy-ring scomplete-ring-inner"></div>
+        <div class="scomplete-trophy-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
+            <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="scomplete-title">Session Complete!</h1>
+      <p class="scomplete-subtitle">You completed your <strong id="scomplete-cat-label">HR Interview</strong> practice session.</p>
+
+      <!-- Stats grid -->
+      <div class="scomplete-stats">
+        <div class="scomplete-stat">
+          <span class="scomplete-stat-val" id="scomplete-answered">7</span>
+          <span class="scomplete-stat-key">Answered</span>
+        </div>
+        <div class="scomplete-stat">
+          <span class="scomplete-stat-val" id="scomplete-skipped">0</span>
+          <span class="scomplete-stat-key">Skipped</span>
+        </div>
+        <div class="scomplete-stat">
+          <span class="scomplete-stat-val" id="scomplete-time-taken">12m 30s</span>
+          <span class="scomplete-stat-key">Time Taken</span>
+        </div>
+        <div class="scomplete-stat">
+          <span class="scomplete-stat-val gradient-text" id="scomplete-score">100%</span>
+          <span class="scomplete-stat-key">Completion</span>
+        </div>
+      </div>
+
+      <!-- Completion bar -->
+      <div class="scomplete-prog-wrap">
+        <div class="scomplete-prog-track">
+          <div class="scomplete-prog-fill" id="scomplete-prog-fill"></div>
+        </div>
+        <span class="scomplete-prog-pct" id="scomplete-prog-pct">100% Answered</span>
+      </div>
+
+      <p class="scomplete-message" id="scomplete-message">Keep practicing — consistency is the key to interview success! 🚀</p>
+
+      <!-- Q&A Review Panel -->
+      <div class="scomplete-review-panel" id="scomplete-review-panel">
+        <h2 class="scomplete-review-title">Interview Review</h2>
+        <div class="scomplete-review-list" id="scomplete-review-list">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- AI Performance Report Section (populated dynamically) -->
+      <div class="scomplete-report-section" id="scomplete-report-section" style="display:none">
+        <!-- Populated by app.js after generate-report API call -->
+      </div>
+
+      <!-- Action buttons -->
+
+      <div class="scomplete-actions">
+        <button class="scomplete-btn-secondary" id="scomplete-retry-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Practice Again
+        </button>
+        <button class="scomplete-btn-primary" id="scomplete-dashboard-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          Back to Dashboard
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- end session-complete -->
+
+  <script src="app.js"></script>
+</body>
+</html>
