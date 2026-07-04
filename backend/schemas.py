@@ -66,6 +66,12 @@ class ReportBase(BaseModel):
     overall_feedback: str
     strengths: str
     weaknesses: str
+    communication_score: Optional[float] = None
+    technical_score: Optional[float] = None
+    confidence_score: Optional[float] = None
+    grammar_corrections: Optional[str] = None
+    ideal_answers: Optional[str] = None
+    improvement_suggestions: Optional[str] = None
 
 class ReportCreate(ReportBase):
     session_id: int

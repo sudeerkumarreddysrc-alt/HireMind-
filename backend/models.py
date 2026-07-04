@@ -79,5 +79,11 @@ class Report(Base):
     overall_feedback = Column(Text)
     strengths = Column(Text)
     weaknesses = Column(Text)
+    communication_score = Column(Float, nullable=True)
+    technical_score = Column(Float, nullable=True)
+    confidence_score = Column(Float, nullable=True)
+    grammar_corrections = Column(Text, nullable=True)
+    ideal_answers = Column(Text, nullable=True)
+    improvement_suggestions = Column(Text, nullable=True)
 
     session = relationship("InterviewSession", back_populates="report")

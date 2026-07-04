@@ -1,13 +1,23 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List
+import os
 
 from . import models, schemas, crud, ai_service
 from .ai_service import AIServiceUnavailableError
 from .database import engine, get_db
+
+# Parent directory of the backend package (= project root with index.html)
+_parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -42,7 +52,10 @@ async def ai_service_unavailable_handler(request: Request, exc: AIServiceUnavail
 def read_root(request: Request):
     accept = request.headers.get("accept", "")
     if "text/html" in accept:
-        return FileResponse(os.path.join(parent_dir, "index.html"))
+        return FileResponse(
+            os.path.join(_parent_dir, "index.html"),
+            headers=NO_CACHE_HEADERS
+        )
     return {"status": "ok", "message": "HireMind Database API is running!"}
 
 # --- Users ---
@@ -101,11 +114,12 @@ def generate_session_questions(session_id: int, db: Session = Depends(get_db)):
     # Use AI to generate questions.
     # AIServiceUnavailableError propagates to the global handler → HTTP 503.
     skills = [s.strip() for s in db_session.subjects.split(",")] if db_session.subjects else []
-    year_label = f"Year {db_session.year}" if db_session.year else "Year 1"
     ai_questions = ai_service.generate_interview_questions(
-        role=db_session.domain,
-        experience=year_label,
-        skills=skills,
+        category=db_session.category,
+        branch=db_session.branch,
+        domain=db_session.domain,
+        year=db_session.year or "1",
+        subjects=skills,
         count=5
     )
 
@@ -212,37 +226,61 @@ def generate_session_report(session_id: int, db: Session = Depends(get_db)):
         qa_history=qa_history
     )
 
+    # Handle serialization for JSON columns safely
+    grammar_corrections = ai_report.get("grammar_corrections", "")
+    if isinstance(grammar_corrections, (list, dict)):
+        grammar_corrections = json.dumps(grammar_corrections)
+    elif grammar_corrections is None:
+        grammar_corrections = "[]"
+
+    ideal_answers = ai_report.get("ideal_answers", "")
+    if isinstance(ideal_answers, (list, dict)):
+        ideal_answers = json.dumps(ideal_answers)
+    elif ideal_answers is None:
+        ideal_answers = "[]"
+
     report_create = schemas.ReportCreate(
         session_id=session_id,
         overall_feedback=ai_report.get("overall_feedback", "No feedback generated."),
         strengths=ai_report.get("strengths", ""),
-        weaknesses=ai_report.get("weaknesses", "")
+        weaknesses=ai_report.get("weaknesses", ""),
+        communication_score=ai_report.get("communication_score"),
+        technical_score=ai_report.get("technical_score"),
+        confidence_score=ai_report.get("confidence_score"),
+        grammar_corrections=grammar_corrections,
+        ideal_answers=ideal_answers,
+        improvement_suggestions=ai_report.get("improvement_suggestions", "")
     )
 
+    import json
     return crud.create_report(db, report_create)
 
 
 # ---------------------------------------------------------------------------
-# Serve frontend static assets securely (single-origin deployment support)
+# Serve frontend static assets — always with no-cache headers
 # ---------------------------------------------------------------------------
-from fastapi.responses import FileResponse
-import os
-
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 @app.get("/app.js")
 def serve_js():
-    return FileResponse(os.path.join(parent_dir, "app.js"))
+    return FileResponse(
+        os.path.join(_parent_dir, "app.js"),
+        headers=NO_CACHE_HEADERS
+    )
 
 @app.get("/styles.css")
 def serve_css():
-    return FileResponse(os.path.join(parent_dir, "styles.css"))
+    return FileResponse(
+        os.path.join(_parent_dir, "styles.css"),
+        headers=NO_CACHE_HEADERS
+    )
 
-# Catch-all for routing to index.html (supports single-page routing if needed)
+# Catch-all: serve index.html for all unmatched routes
 @app.get("/{path:path}")
 def serve_index(path: str):
-    # If the path points to an API route that 404s, don't shadow it
     if path.startswith("api/"):
         raise HTTPException(status_code=404, detail="API endpoint not found")
-    return FileResponse(os.path.join(parent_dir, "index.html"))
+    return FileResponse(
+        os.path.join(_parent_dir, "index.html"),
+        headers=NO_CACHE_HEADERS
+    )
 
