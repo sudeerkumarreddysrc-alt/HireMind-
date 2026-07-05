@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List
 import os
+import json
 
 from . import models, schemas, crud, ai_service
 from .ai_service import AIServiceUnavailableError
@@ -252,7 +253,6 @@ def generate_session_report(session_id: int, db: Session = Depends(get_db)):
         improvement_suggestions=ai_report.get("improvement_suggestions", "")
     )
 
-    import json
     return crud.create_report(db, report_create)
 
 

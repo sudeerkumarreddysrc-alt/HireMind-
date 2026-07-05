@@ -206,8 +206,21 @@ def generate_mock_questions(category, branch, year, domain, subjects, company, r
         })
     return questions
 
-if GEMINI_API_KEY and GEMINI_API_KEY != "your_google_gemini_api_key_here":
-    if GEMINI_API_KEY == "mock":
+is_real_key = False
+if GEMINI_API_KEY:
+    key_clean = GEMINI_API_KEY.strip()
+    if key_clean and key_clean.lower() not in ["mock", "your_api_key_here", "your_google_gemini_api_key_here"]:
+        is_real_key = True
+
+if is_real_key:
+    try:
+        _client = genai.Client(api_key=GEMINI_API_KEY)
+        print(f"[HireMind] Gemini client initialised with model: {GEMINI_MODEL}")
+    except Exception as e:
+        print(f"[HireMind] Error initialising real Gemini client: {e}. Falling back to mock client.")
+        is_real_key = False
+
+if not is_real_key:
         class MockModels:
             def generate_content(self, model, contents, config=None):
                 class MockResponse:
@@ -414,12 +427,7 @@ if GEMINI_API_KEY and GEMINI_API_KEY != "your_google_gemini_api_key_here":
                 self.models = MockModels()
         
         _client = MockClient()
-        print(f"[HireMind] Mock Gemini client initialised with model: {GEMINI_MODEL}")
-    else:
-        _client = genai.Client(api_key=GEMINI_API_KEY)
-        print(f"[HireMind] Gemini client initialised with model: {GEMINI_MODEL}")
-else:
-    print("[HireMind] WARNING: GEMINI_API_KEY is not set. AI features will be disabled.")
+        print(f"[HireMind] Mock Gemini client initialised (fallback) with model: {GEMINI_MODEL}")
 
 
 class AIServiceUnavailableError(Exception):
