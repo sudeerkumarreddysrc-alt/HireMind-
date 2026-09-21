@@ -221,7 +221,7 @@ window.updateProfileUI = function() {
   const h1 = qs('.dashboard-greeting h1');
   if (h1) {
     const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const greeting = (hour >= 5 && hour < 12) ? 'Good morning' : (hour >= 12 && hour < 17) ? 'Good afternoon' : 'Good evening';
     h1.innerHTML = `${greeting}, <span class="gradient-text">${(function(str) {
       const p = document.createElement('p');
       p.textContent = str;
@@ -1676,14 +1676,32 @@ function addActivityEntry(color, text) {
   ];
 
   let idx = 0;
+  let _liveActivityInterval = null; // FIX: store the ID so we can clear it
+
   setTimeout(() => {
     addActivityEntry(events[idx % events.length].color, events[idx % events.length].text);
     idx++;
-    setInterval(() => {
-      addActivityEntry(events[idx % events.length].color, events[idx % events.length].text);
-      idx++;
-    }, 20000);
+    if (!_liveActivityInterval) { // FIX: guard against duplicate intervals
+      _liveActivityInterval = setInterval(() => {
+        addActivityEntry(events[idx % events.length].color, events[idx % events.length].text);
+        idx++;
+      }, 20000);
+    }
   }, 15000);
+
+  /* Exposed so the interview session can pause cosmetic feed updates */
+  window._liveActivity = {
+    stop() {
+      if (_liveActivityInterval) { clearInterval(_liveActivityInterval); _liveActivityInterval = null; }
+    },
+    start() {
+      if (_liveActivityInterval) return; // already running
+      _liveActivityInterval = setInterval(() => {
+        addActivityEntry(events[idx % events.length].color, events[idx % events.length].text);
+        idx++;
+      }, 20000);
+    }
+  };
 })();
 
 /* ============================================================
@@ -1696,6 +1714,8 @@ function addActivityEntry(color, text) {
   if (!orb1 || !orb2 || !orb3) return;
 
   let tX = 0, tY = 0, cX = 0, cY = 0;
+  let _rafId  = null;   // FIX: store the RAF handle so we can cancel it
+  let _running = false; // FIX: explicit running flag prevents an unstoppable loop
 
   window.addEventListener('mousemove', (e) => {
     tX = (e.clientX / window.innerWidth - 0.5) * 30;
@@ -1703,14 +1723,29 @@ function addActivityEntry(color, text) {
   });
 
   function animate() {
+    if (!_running) return;   // FIX: bail out immediately when stopped
     cX += (tX - cX) * 0.04;
     cY += (tY - cY) * 0.04;
     orb1.style.transform = `translate(${cX * .8}px, ${cY * .8}px)`;
     orb2.style.transform = `translate(${-cX * .6}px, ${-cY * .6}px)`;
     orb3.style.transform = `translate(${cX * 1.2}px, ${cY * 1.2}px) translateX(-50%) translateY(-50%)`;
-    requestAnimationFrame(animate);
+    _rafId = requestAnimationFrame(animate); // FIX: capture handle
   }
-  requestAnimationFrame(animate);
+
+  /* Exposed so session management can pause the loop during interviews */
+  window._parallax = {
+    start() {
+      if (_running) return;
+      _running = true;
+      _rafId = requestAnimationFrame(animate);
+    },
+    stop() {
+      _running = false;
+      if (_rafId !== null) { cancelAnimationFrame(_rafId); _rafId = null; }
+    }
+  };
+
+  window._parallax.start();
 })();
 
 /* ============================================================
@@ -1747,38 +1782,121 @@ function addActivityEntry(color, text) {
    ============================================================ */
 (function initSessionNavigation() {
 
-  /* â”€â”€ API CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── API CONFIG ────────────────────────────────────────── */
   const API_BASE = window.location.origin;
 
-  /* â”€â”€ FALLBACK sample questions (used when backend is offline) */
+  /* ── FALLBACK sample questions (used when backend is offline) */
   const sampleQuestions = {
     hr: [
-      { id: null, text: "Tell me about yourself and your professional background.", difficulty: "Easy", topic: "Introduction", hint: "Structure it: who you are, your experience, and what you're looking for." },
+      { id: null, text: "Tell me about yourself and your academic background.", difficulty: "Easy", topic: "Introduction", hint: "Structure it: background, key achievements, and core interests." },
       { id: null, text: "Why do you want to join our organization, and what value can you bring?", difficulty: "Easy", topic: "Company Fit", hint: "Show you researched the company and connect their mission with your skills." },
       { id: null, text: "What are your long-term career goals for the next five years?", difficulty: "Easy", topic: "Career Path", hint: "Discuss growth, learning, and alignment with company goals." },
-      { id: null, text: "Describe a time you faced a difficult conflict at work and how you resolved it.", difficulty: "Medium", topic: "Conflict Resolution", hint: "Use the STAR method (Situation, Task, Action, Result)." },
-      { id: null, text: "What is your greatest weakness, and what steps have you taken to improve it?", difficulty: "Medium", topic: "Self Awareness", hint: "Choose a real weakness and focus on your recovery plan." }
+      { id: null, text: "Describe a time you faced a difficult conflict in a team project and how you resolved it.", difficulty: "Medium", topic: "Conflict Resolution", hint: "Use the STAR method (Situation, Task, Action, Result)." },
+      { id: null, text: "What is your greatest weakness, and what steps have you taken to improve it?", difficulty: "Medium", topic: "Self Awareness", hint: "Choose a real weakness and focus on your improvement steps." }
     ],
-    sde: [
-      { id: null, text: "What is the time and space complexity of QuickSort and MergeSort?", difficulty: "Easy", topic: "Algorithms", hint: "Cover best, worst, and average cases." },
-      { id: null, text: "Explain the concepts of ACID properties in DBMS.", difficulty: "Easy", topic: "Databases", hint: "Detail Atomicity, Consistency, Isolation, and Durability." },
-      { id: null, text: "Explain the difference between a process and a thread.", difficulty: "Medium", topic: "Operating Systems", hint: "Discuss virtual space, concurrency overhead, and IPC." },
-      { id: null, text: "How would you design a scalable URL shortening service like Bitly?", difficulty: "Hard", topic: "System Design", hint: "Discuss base62 encoding, caching, and redirection." },
-      { id: null, text: "Explain the CAP theorem in distributed database systems.", difficulty: "Hard", topic: "Distributed Systems", hint: "Consistency, Availability, Partition tolerance trade-offs." }
-    ],
-    custom: [
-      { id: null, text: "Describe your experience working on software projects.", difficulty: "Easy", topic: "Experience", hint: "Focus on your contribution, tech stack, and outcomes." },
-      { id: null, text: "How do you stay updated with the latest trends in your industry?", difficulty: "Easy", topic: "Continuous Learning", hint: "Talk about blogs, open-source work, and conferences." },
-      { id: null, text: "Tell me about a project that you're proud of.", difficulty: "Medium", topic: "Project Work", hint: "Explain the problem, your approach, and how you solved issues." },
-      { id: null, text: "Describe a complex technical issue you encountered and fixed.", difficulty: "Hard", topic: "Problem Solving", hint: "Detail your debugging methodology and post-mortem analysis." },
-      { id: null, text: "What motivates you in your career?", difficulty: "Easy", topic: "Motivation", hint: "Be genuine and connect with your goals." }
-    ],
+    web: {
+      "1": [
+        { id: null, text: "Introduce yourself. Why are you interested in Web Development and how are you starting to learn HTML, CSS, and JS?", difficulty: "Easy", topic: "Self Intro", hint: "Talk about your background, web projects or online courses." },
+        { id: null, text: "What is the difference between HTML `<div>` and `<span>` tags? Explain block vs inline layout.", difficulty: "Easy", topic: "HTML/CSS Basics", hint: "Div is block-level (full width); Span is inline (wraps content)." },
+        { id: null, text: "What is the difference between `let`, `const`, and `var` in JavaScript?", difficulty: "Easy", topic: "JS Fundamentals", hint: "Var is function-scoped; Let and Const are block-scoped." },
+        { id: null, text: "What is the DOM (Document Object Model) and how does JavaScript interact with it?", difficulty: "Easy", topic: "DOM Basics", hint: "DOM represents document structure as nodes manipulated by JS." },
+        { id: null, text: "How do you ensure a web page looks good on both mobile screens and desktop monitors?", difficulty: "Easy", topic: "Responsive Web", hint: "Use CSS media queries, responsive units, and flexbox/grid." }
+      ],
+      "2": [
+        { id: null, text: "Explain event bubbling and event capturing in JavaScript. How does event delegation work?", difficulty: "Medium", topic: "Event Handling", hint: "Bubbling propagates up; Event delegation uses single parent listener." },
+        { id: null, text: "What is the difference between CSS Flexbox and CSS Grid?", difficulty: "Medium", topic: "Frontend Layout", hint: "Flexbox is 1D (row/col); Grid is 2D (rows AND cols)." },
+        { id: null, text: "How do Promises and `async/await` work in JavaScript when making API requests?", difficulty: "Medium", topic: "Async JS", hint: "Promises manage async operations; async/await is cleaner syntax." },
+        { id: null, text: "Explain HTTP methods (GET, POST, PUT, DELETE) and standard status codes (200, 404, 500).", difficulty: "Medium", topic: "REST APIs", hint: "GET reads, POST creates, PUT updates, DELETE removes. 200 OK, 404 Not Found." },
+        { id: null, text: "Describe a team web project you worked on recently. How did you handle version control?", difficulty: "Medium", topic: "Web Project", hint: "Discuss Git branches, PRs, merge conflicts, and team collaboration." }
+      ],
+      "3": [
+        { id: null, text: "Explain Client-Side Rendering (CSR) vs Server-Side Rendering (SSR). What are trade-offs for SEO?", difficulty: "Medium", topic: "Rendering Systems", hint: "CSR renders in browser; SSR pre-renders on server for better SEO." },
+        { id: null, text: "In React (or your framework), explain Props vs State and component lifecycle.", difficulty: "Medium", topic: "Frontend Frameworks", hint: "Props are read-only inputs; State is local mutable component data." },
+        { id: null, text: "What is CORS and how do you secure web APIs using JWT authentication?", difficulty: "Medium", topic: "Web Security & Auth", hint: "CORS controls cross-origin requests; JWT tokens store signed headers." },
+        { id: null, text: "How do you optimize web application performance (lazy loading, code splitting, CDN)?", difficulty: "Medium", topic: "Web Optimization", hint: "Reduce bundle size, defer offscreen assets, cache on CDN." },
+        { id: null, text: "Walk me through a full-stack project you built connecting frontend to backend database.", difficulty: "Medium", topic: "Fullstack Project", hint: "Detail API integration, state management, DB persistence, and hosting." }
+      ],
+      "4": [
+        { id: null, text: "How would you design the web architecture for a real-time collaborative app scaling to 100k active users?", difficulty: "Hard", topic: "Web Architecture", hint: "Use WebSockets, Redis pub-sub, stateless node workers, DB sharding." },
+        { id: null, text: "Explain OWASP Top 10 vulnerabilities (XSS, CSRF, SQL Injection) and how to prevent each.", difficulty: "Hard", topic: "Web Security", hint: "Sanitize inputs (XSS), anti-CSRF tokens, parameterized queries (SQLi)." },
+        { id: null, text: "Compare WebSockets, Server-Sent Events (SSE), and HTTP Long Polling for real-time communication.", difficulty: "Hard", topic: "Real-time Protocols", hint: "WebSockets=duplex, SSE=server stream, Long Polling=repeated client requests." },
+        { id: null, text: "How do you set up a Web CI/CD pipeline with Docker, E2E tests, and zero-downtime deployment?", difficulty: "Hard", topic: "Web DevOps", hint: "Automate build, test with Cypress, containerize, and deploy to cloud." },
+        { id: null, text: "Tell me about a critical production performance bug you resolved in a live web app.", difficulty: "Hard", topic: "Web Leadership", hint: "Detail profiling tools, root cause analysis, and measurable optimization." }
+      ]
+    },
+    data: {
+      "1": [
+        { id: null, text: "Introduce yourself. Why are you interested in Data Analytics and how do you work with data?", difficulty: "Easy", topic: "Introduction", hint: "Mention background, interest in data insights, and tools like Excel." },
+        { id: null, text: "What is the difference between VLOOKUP and XLOOKUP in Microsoft Excel?", difficulty: "Easy", topic: "Spreadsheets", hint: "XLOOKUP searches any direction and defaults to exact match." },
+        { id: null, text: "Explain Mean, Median, and Mode. When is Median preferred over Mean?", difficulty: "Easy", topic: "Descriptive Stats", hint: "Median is middle value; preferred when data has extreme outliers." },
+        { id: null, text: "What is the difference between a Bar Chart and a Line Chart? When should you use each?", difficulty: "Easy", topic: "Data Visualization", hint: "Bar charts compare categories; Line charts show continuous trends." },
+        { id: null, text: "How do you organize messy data in a spreadsheet before beginning analysis?", difficulty: "Easy", topic: "Data Preparation", hint: "Remove duplicates, fix formatting, handle missing values." }
+      ],
+      "2": [
+        { id: null, text: "Write the SQL query structure to select records where `sales > 10000` grouped by region.", difficulty: "Medium", topic: "SQL Queries", hint: "SELECT region, SUM(sales) FROM data WHERE sales > 10000 GROUP BY region;" },
+        { id: null, text: "What is data cleaning, and how do you handle missing values in a dataset?", difficulty: "Medium", topic: "Data Cleaning", hint: "Impute mean/median for numerical data, mode for categorical, or drop if sparse." },
+        { id: null, text: "In Python Pandas, what is the difference between a Series and a DataFrame?", difficulty: "Medium", topic: "Python Pandas", hint: "Series is a 1D labeled array; DataFrame is a 2D tabular structure." },
+        { id: null, text: "Explain Population vs Sample in statistics. Why is random sampling essential?", difficulty: "Medium", topic: "Statistical Sampling", hint: "Population is entire set; Sample is subset. Random sampling avoids bias." },
+        { id: null, text: "Describe a project where you analyzed a dataset to extract actionable insights.", difficulty: "Medium", topic: "Analytics Project", hint: "Explain dataset, tools (Excel/SQL/Python), metrics, and conclusions." }
+      ],
+      "3": [
+        { id: null, text: "Explain SQL Joins (INNER, LEFT, RIGHT, FULL) with a concrete business example.", difficulty: "Medium", topic: "Advanced SQL", hint: "INNER matches both; LEFT keeps all left; FULL keeps all records." },
+        { id: null, text: "What is Exploratory Data Analysis (EDA)? Walk me through your step-by-step process.", difficulty: "Medium", topic: "Analytics Pipeline", hint: "Inspect shape, dtypes, summary stats, missing values, correlation." },
+        { id: null, text: "How do you calculate Key Performance Indicators (KPIs) like CAC and Retention Rate?", difficulty: "Medium", topic: "Business Intelligence", hint: "CAC = Total Marketing / New Customers; Retention = Active / Starting." },
+        { id: null, text: "Explain hypothesis testing, null hypothesis ($H_0$), p-value, and significance level.", difficulty: "Medium", topic: "Inferential Stats", hint: "H0 assumes no effect; Reject H0 if p-value < alpha (0.05)." },
+        { id: null, text: "Describe a dashboard you built in Tableau/Power BI to communicate findings.", difficulty: "Medium", topic: "BI Dashboards", hint: "Focus on executive KPIs at top, trends in middle, interactive filters." }
+      ],
+      "4": [
+        { id: null, text: "What are SQL Window Functions (`ROW_NUMBER()`, `RANK()`, `LEAD()`, `LAG()`)? Give an example query.", difficulty: "Hard", topic: "Complex SQL", hint: "RANK() OVER (PARTITION BY dept ORDER BY sales DESC) ranks within group." },
+        { id: null, text: "How do you design and evaluate an A/B test for a major product feature?", difficulty: "Hard", topic: "Experimental Design", hint: "Define metric, calculate sample size for power, split traffic, run t-test." },
+        { id: null, text: "Explain dimensional modeling in Data Warehousing: Star Schema vs Snowflake Schema.", difficulty: "Hard", topic: "Data Warehousing", hint: "Fact tables contain metrics; Dimension tables contain descriptive context." },
+        { id: null, text: "How do you handle big datasets in Python when operations exceed available RAM?", difficulty: "Hard", topic: "Big Data Analytics", hint: "Process in chunks via Pandas chunksize, use Parquet format, or PySpark." },
+        { id: null, text: "Describe a scenario where your data analysis led to a recommendation contested by stakeholders.", difficulty: "Hard", topic: "Stakeholder Management", hint: "Use STAR method: detail data validation, sensitivity tests, visual evidence." }
+      ]
+    },
+    sde: {
+      "1": [
+        { id: null, text: "Introduce yourself. Why did you choose Software Development as your career goal?", difficulty: "Easy", topic: "Self Intro", hint: "Summarize your background, interests, and coding journey." },
+        { id: null, text: "What is the difference between a variable and a constant in programming?", difficulty: "Easy", topic: "Fundamentals", hint: "Variable values change; constants are fixed immutable values." },
+        { id: null, text: "Explain `if-else` vs `switch` statement in programming logic.", difficulty: "Easy", topic: "Control Flow", hint: "If-else evaluates dynamic booleans; Switch evaluates discrete values." },
+        { id: null, text: "What is an array and how do you access elements in a basic language?", difficulty: "Easy", topic: "Data Structures", hint: "Arrays store elements sequentially using 0-based indexing." },
+        { id: null, text: "How do you approach debugging when code produces an unexpected error?", difficulty: "Easy", topic: "Debugging", hint: "Inspect print logs, check edge inputs, step through line by line." }
+      ],
+      "2": [
+        { id: null, text: "Explain Object-Oriented Programming (OOP) and its 4 main pillars.", difficulty: "Medium", topic: "OOP Principles", hint: "Encapsulation, Inheritance, Polymorphism, Abstraction." },
+        { id: null, text: "What is the difference between Array and Linked List in memory structure?", difficulty: "Medium", topic: "Data Structures", hint: "Array has contiguous memory O(1) access; Linked list uses pointers." },
+        { id: null, text: "Explain Stack vs Queue in data structures with real-world applications.", difficulty: "Medium", topic: "Data Structures", hint: "Stack is LIFO (undo buffer); Queue is FIFO (task processing)." },
+        { id: null, text: "What is time complexity of Linear Search vs Binary Search?", difficulty: "Medium", topic: "Algorithms", hint: "Linear search is O(n); Binary search is O(log n) on sorted array." },
+        { id: null, text: "Describe a team project where you fixed a tricky bug during integration.", difficulty: "Medium", topic: "Team Debugging", hint: "Discuss reproduction steps, isolating module bug, writing tests." }
+      ],
+      "3": [
+        { id: null, text: "How would you design a simple RESTful API for a library system?", difficulty: "Medium", topic: "API Design", hint: "Define endpoints, GET/POST/PUT/DELETE verbs, and standard status codes." },
+        { id: null, text: "Explain SQL vs NoSQL databases. When would you choose NoSQL?", difficulty: "Medium", topic: "Databases", hint: "SQL has strict schema ACID; NoSQL scales horizontally BASE." },
+        { id: null, text: "Explain Singleton and Factory design patterns with practical software examples.", difficulty: "Medium", topic: "Design Patterns", hint: "Singleton ensures 1 instance; Factory encapsulates object creation." },
+        { id: null, text: "What is the difference between Process and Thread, and how does virtual memory work?", difficulty: "Medium", topic: "Operating Systems", hint: "Process has isolated memory; Threads share process memory space." },
+        { id: null, text: "Describe a complex software project you built using the STAR method.", difficulty: "Medium", topic: "Project Work", hint: "Explain Situation, Task, Action (tech stack), and quantitative Result." }
+      ],
+      "4": [
+        { id: null, text: "How would you design a scalable URL shortener or notification service for millions of users?", difficulty: "Hard", topic: "System Design", hint: "Use load balancers, Redis cache, Kafka queues, database partitioning." },
+        { id: null, text: "Explain the CAP theorem in distributed systems during network partitions.", difficulty: "Hard", topic: "Distributed Systems", hint: "Consistency vs Availability trade-offs under network partition tolerance." },
+        { id: null, text: "How do you detect and resolve memory leaks or CPU bottlenecks in production?", difficulty: "Hard", topic: "Performance Optimization", hint: "Use memory profilers, heap dumps, flame graphs, and query tuning." },
+        { id: null, text: "How do you refactor a legacy codebase without breaking existing API functionality?", difficulty: "Hard", topic: "Software Quality", hint: "Write integration tests first, use Strangler Fig pattern, deploy safely." },
+        { id: null, text: "Tell me about a technical decision you regretted. What did you learn?", difficulty: "Hard", topic: "Engineering Judgement", hint: "Share trade-off analysis, honest retrospectives, and corrective actions." }
+      ]
+    },
     company: [
-      { id: null, text: "Why do you want to work at this company specifically? What excites you about its products and mission?", difficulty: "Easy", topic: "Company Fit", hint: "Research the company's culture, values, and recent projects before answering." },
-      { id: null, text: "Given an array of integers, find two numbers that sum to a target. Describe your most efficient approach.", difficulty: "Medium", topic: "Algorithms", hint: "Think about hash maps for O(n) time complexity (Two Sum pattern)." },
+      { id: null, text: "Why do you want to work at this company specifically? What excites you about its products?", difficulty: "Easy", topic: "Company Fit", hint: "Research the company's culture, values, and recent projects before answering." },
+      { id: null, text: "Given an array of integers, find two numbers that sum to a target value.", difficulty: "Medium", topic: "Algorithms", hint: "Think about hash maps for O(n) time complexity (Two Sum pattern)." },
       { id: null, text: "How would you design a scalable notification system that handles millions of users?", difficulty: "Hard", topic: "System Design", hint: "Discuss message queues (Kafka/SQS), fan-out patterns, and delivery guarantees." },
       { id: null, text: "Tell me about a time you disagreed with a technical decision and how you handled it.", difficulty: "Medium", topic: "Behavioral", hint: "Use the STAR method. Show data-driven reasoning and respect for team decisions." },
       { id: null, text: "What is the difference between horizontal and vertical scaling? When would you choose each?", difficulty: "Medium", topic: "System Design", hint: "Cover stateless services (horizontal) vs. resource upgrades (vertical) and trade-offs." }
+    ],
+    custom: [
+      { id: null, text: "Describe your background and interest in your chosen custom interview topic.", difficulty: "Easy", topic: "Background", hint: "Focus on your learning journey, projects, and motivation." },
+      { id: null, text: "What are the core foundational principles of your target subject area?", difficulty: "Easy", topic: "Fundamentals", hint: "Define the key terms, use cases, and core mechanisms." },
+      { id: null, text: "Tell me about a project or practical application where you applied these concepts.", difficulty: "Medium", topic: "Project Work", hint: "Explain the problem, your technical approach, and key takeaways." },
+      { id: null, text: "Describe a complex problem you encountered in this domain and how you debugged it.", difficulty: "Hard", topic: "Problem Solving", hint: "Detail your troubleshooting methodology, tools used, and results." },
+      { id: null, text: "How do you stay updated with advances and best practices in this field?", difficulty: "Easy", topic: "Continuous Learning", hint: "Discuss technical blogs, documentation, open source, and projects." }
     ]
   };
 
@@ -1953,9 +2071,20 @@ function addActivityEntry(color, text) {
       console.warn('Backend unavailable, using fallback questions:', err.message);
       showErrorToast('Backend offline — using built-in questions. Start backend for AI mode.');
 
-      // Fallback to sample questions
-      const pool = sampleQuestions[domain] || sampleQuestions[category] || sampleQuestions['custom'];
-      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      // Fallback to sample questions (Domain x Year aware)
+      let pool = null;
+      const yrKey = String(year || '1');
+      const domKey = (domain || category || '').toLowerCase();
+      if (domKey.includes('web') && sampleQuestions.web) {
+        pool = sampleQuestions.web[yrKey] || sampleQuestions.web['1'];
+      } else if ((domKey.includes('data') || domKey.includes('analyst')) && sampleQuestions.data) {
+        pool = sampleQuestions.data[yrKey] || sampleQuestions.data['1'];
+      } else if (sampleQuestions.sde && sampleQuestions.sde[yrKey]) {
+        pool = sampleQuestions.sde[yrKey];
+      } else {
+        pool = sampleQuestions[category] || sampleQuestions['custom'];
+      }
+      const shuffled = [...(pool || sampleQuestions.custom)].sort(() => 0.5 - Math.random());
       questions = shuffled.slice(0, 5);
     } finally {
       hideLoadingOverlay();
@@ -2023,6 +2152,12 @@ function addActivityEntry(color, text) {
     }
     if (rToggleLbl) rToggleLbl.textContent = 'View AI Performance Report';
     if (rSection) { rSection.style.display = 'none'; rSection.innerHTML = ''; }
+
+    // Pause background animations while the interview screen is active
+    // to stop the infinite RAF loop and live-activity interval from running
+    // against invisible DOM elements and wasting memory.
+    window._parallax?.stop();
+    window._liveActivity?.stop();
 
     // Switch panels
     if (navbar) navbar.style.display = 'none';
@@ -2784,7 +2919,9 @@ function addActivityEntry(color, text) {
         if (isessCamBtn) isessCamBtn.classList.add('off');
       }
     } else {
-      if (sessionState.mediaStream) sessionState.mediaStream.getVideoTracks().forEach(t => t.stop());
+      // FIX: stop ALL tracks (video + audio) not just video tracks, to fully
+      // release the camera MediaStream and its associated hardware buffer.
+      if (sessionState.mediaStream) sessionState.mediaStream.getTracks().forEach(t => t.stop());
       if (camVideo) { camVideo.srcObject = null; camVideo.style.display = 'none'; }
       if (placeholder) placeholder.style.display = 'flex';
       if (offBadge) offBadge.hidden = false;
@@ -2796,61 +2933,102 @@ function addActivityEntry(color, text) {
   /* â”€â”€ SPEECH RECOGNITION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  /**
+   * FIX: Fully destroy the current SpeechRecognition instance.
+   * Nulls all event handlers, calls abort(), and clears the state reference.
+   * Safe to call even when recognition is already null or stopped.
+   * Must be called before creating any new instance to prevent stale closures
+   * and accumulated result lists from accumulating in memory.
+   */
+  function _destroyRecognition() {
+    if (!sessionState.recognition) return;
+    sessionState.isSpeechRestarting = false;
+    sessionState.isRecognitionActive = false;
+    const rec = sessionState.recognition;
+    sessionState.recognition = null; // clear reference FIRST so onend can't re-trigger
+    rec.onstart  = null;
+    rec.onresult = null;
+    rec.onerror  = null;
+    rec.onend    = null;
+    try { rec.abort(); } catch (_) {}
+  }
+
   function startSpeechRecognition() {
     if (!SpeechRecognition) { console.warn('Speech Recognition not supported.'); return; }
 
-    if (!sessionState.recognition) {
-      sessionState.recognition = new SpeechRecognition();
-      sessionState.recognition.continuous = true;
-      sessionState.recognition.interimResults = true;
-      sessionState.recognition.lang = 'en-US';
+    // FIX: Always destroy the old instance before creating a new one.
+    // This prevents stale SpeechRecognitionResultList objects from persisting
+    // in memory and keeps event-handler closures from leaking.
+    _destroyRecognition();
 
-      sessionState.recognition.onstart = () => { sessionState.isRecognitionActive = true; };
+    sessionState.preSpeechText = isessTextarea ? isessTextarea.value.trim() : '';
 
-      sessionState.recognition.onresult = (e) => {
-        let transcript = '';
-        for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript;
-        if (isessTextarea) {
-          isessTextarea.value = sessionState.preSpeechText + (sessionState.preSpeechText ? ' ' : '') + transcript;
-          isessTextarea.dispatchEvent(new Event('input'));
+    const rec = new SpeechRecognition();
+    rec.continuous     = true;
+    rec.interimResults = true;
+    rec.lang           = 'en-US';
+
+    rec.onstart = () => { sessionState.isRecognitionActive = true; };
+
+    rec.onresult = (e) => {
+      // FIX: Use e.resultIndex to process ONLY new/changed results instead of
+      // iterating the entire accumulated SpeechRecognitionResultList from i=0.
+      // This prevents the result list from growing unboundedly over a long session.
+      let interimTranscript = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const text = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          // Commit finalised speech into preSpeechText so it survives restarts
+          sessionState.preSpeechText += (sessionState.preSpeechText ? ' ' : '') + text.trim();
+        } else {
+          interimTranscript += text;
         }
-      };
+      }
+      if (isessTextarea) {
+        isessTextarea.value = sessionState.preSpeechText +
+          (interimTranscript ? (sessionState.preSpeechText ? ' ' : '') + interimTranscript : '');
+        isessTextarea.dispatchEvent(new Event('input'));
+      }
+    };
 
-      sessionState.recognition.onerror = (e) => {
-        console.error('Speech error:', e);
-        if (e.error === 'not-allowed') {
-          showErrorToast('Microphone permission blocked. Voice input disabled.');
-          if (sessionState.isMicOn) toggleMic();
-        }
-      };
+    rec.onerror = (e) => {
+      console.error('Speech error:', e.error);
+      if (e.error === 'not-allowed') {
+        showErrorToast('Microphone permission blocked. Voice input disabled.');
+        if (sessionState.isMicOn) toggleMic();
+      }
+    };
 
-      sessionState.recognition.onend = () => {
-        sessionState.isRecognitionActive = false;
-        if (sessionState.isSpeechRestarting) {
-          sessionState.isSpeechRestarting = false;
-          if (isessTextarea) sessionState.preSpeechText = isessTextarea.value.trim();
-          try { sessionState.recognition.start(); } catch (err) { }
-        }
-      };
-    }
+    rec.onend = () => {
+      sessionState.isRecognitionActive = false;
+      // FIX: Auto-restart only when the mic is still intentionally on AND the
+      // session is still active. disableMic() / endSession() set isMicOn=false
+      // or isSessionActive=false BEFORE stopping recognition, so this guard
+      // cleanly prevents the restart loop from firing during intentional stops.
+      if (sessionState.isMicOn && sessionState.isSessionActive && sessionState.recognition) {
+        sessionState.preSpeechText = isessTextarea ? isessTextarea.value.trim() : '';
+        try { sessionState.recognition.start(); } catch (_) {}
+      }
+    };
 
-    if (!sessionState.isRecognitionActive) {
-      if (isessTextarea) sessionState.preSpeechText = isessTextarea.value.trim();
-      try { sessionState.recognition.start(); } catch (err) { }
-    }
+    sessionState.recognition = rec;
+    try { sessionState.recognition.start(); } catch (_) {}
   }
 
   function stopSpeechRecognition() {
     if (sessionState.recognition && sessionState.isRecognitionActive) {
-      sessionState.recognition.stop();
       sessionState.isRecognitionActive = false;
+      try { sessionState.recognition.stop(); } catch (_) {}
     }
   }
 
   function restartSpeechRecognition() {
-    if (sessionState.recognition && sessionState.isRecognitionActive) {
-      sessionState.isSpeechRestarting = true;
-      sessionState.recognition.stop();
+    // FIX: No longer restarts recognition on every keystroke.
+    // With e.resultIndex tracking, preSpeechText is updated correctly by the
+    // onresult handler as results are finalised. We only need to sync the
+    // textarea's current value so the next speech result appends correctly.
+    if (sessionState.isRecognitionActive) {
+      sessionState.preSpeechText = isessTextarea ? isessTextarea.value.trim() : '';
     }
   }
 
@@ -2862,6 +3040,9 @@ function addActivityEntry(color, text) {
       startSpeechRecognition();
       const spans = qsa('#isess-mic-viz span');
       if (spans.length > 0) {
+        // FIX: always clear the previous interval before creating a new one
+        // to prevent a second interval from running if toggleMic fires rapidly.
+        if (micInterval) { clearInterval(micInterval); micInterval = null; }
         micInterval = setInterval(() => {
           spans.forEach(s => { s.style.height = `${Math.floor(Math.random() * 12) + 3}px`; });
         }, 120);
@@ -2870,6 +3051,7 @@ function addActivityEntry(color, text) {
       sessionState.isMicOn = false;
       if (isessMicBtn) isessMicBtn.classList.add('off');
       stopSpeechRecognition();
+      _destroyRecognition(); // FIX: fully release the SpeechRecognition object
       if (micInterval) { clearInterval(micInterval); micInterval = null; }
       qsa('#isess-mic-viz span').forEach(s => s.style.height = '3px');
     }
@@ -2880,6 +3062,7 @@ function addActivityEntry(color, text) {
       sessionState.isMicOn = false;
       if (isessMicBtn) isessMicBtn.classList.add('off');
       stopSpeechRecognition();
+      _destroyRecognition(); // FIX: fully release the SpeechRecognition object
       if (micInterval) { clearInterval(micInterval); micInterval = null; }
       qsa('#isess-mic-viz span').forEach(s => s.style.height = '3px');
     }
@@ -2889,7 +3072,13 @@ function addActivityEntry(color, text) {
   if (isessTextarea) {
     isessTextarea.addEventListener('input', (e) => {
       if (isessCharCount) isessCharCount.textContent = `${isessTextarea.value.length} / 1000`;
-      if (e.isTrusted && sessionState.isRecognitionActive) restartSpeechRecognition();
+      // FIX: Sync preSpeechText on real user edits so subsequent speech results
+      // append after the typed text. We no longer restart recognition on every
+      // keystroke — the e.resultIndex-based onresult handler correctly tracks
+      // final vs interim speech without needing a full recognition restart.
+      if (e.isTrusted && sessionState.isRecognitionActive) {
+        sessionState.preSpeechText = isessTextarea.value.trim();
+      }
     });
     isessTextarea.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); nextQuestion(); }
@@ -2906,6 +3095,15 @@ function addActivityEntry(color, text) {
   if (scompleteRetryBtn) {
     scompleteRetryBtn.addEventListener('click', () => {
       if (sessionComplete) { sessionComplete.setAttribute('hidden', ''); sessionComplete.style.display = 'none'; }
+      // FIX: fully clean up all resources from the previous session before
+      // starting a new one, so recognition objects, intervals, and streams
+      // don't accumulate across retries.
+      _destroyRecognition();
+      if (micInterval) { clearInterval(micInterval); micInterval = null; }
+      if (sessionState.mediaStream) {
+        sessionState.mediaStream.getTracks().forEach(t => t.stop());
+        sessionState.mediaStream = null;
+      }
       window.startInterviewSession(
         sessionState.activeCategory,
         sessionState.activeYear,
@@ -2927,6 +3125,9 @@ function addActivityEntry(color, text) {
       qsa('.nav-links li a, .mobile-nav a').forEach(a => {
         a.classList.toggle('active', a.textContent.trim().toLowerCase() === 'dashboard');
       });
+      // FIX: resume background animations now that the dashboard is visible again
+      window._parallax?.start();
+      window._liveActivity?.start();
       // Refresh dashboard stats after session
       const rawStats = HireMindStore.getStats();
       const { totalInterviews, bestScore, avgScore, practiceHours } = HireMindStore.computeDisplayStats(rawStats);

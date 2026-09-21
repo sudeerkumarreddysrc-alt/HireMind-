@@ -183,17 +183,21 @@ def get_curated_questions(
             domain_key = "product"
 
         domains_to_try = [domain_key]
-        if domain_key != "general":
-            domains_to_try.append("general")
-        # Fallback to general programming and other domains to avoid falling back to HR/Default
-        for fallback_dom in ["Programming", "Data Structures", "Algorithms", "OOP", "DBMS", "Operating Systems", "Computer Networks", "Web Development", "Backend", "Full Stack", "AI/ML", "Data Science"]:
-            # Check direct match or case-insensitive/lower match
-            if fallback_dom not in domains_to_try:
-                domains_to_try.append(fallback_dom)
-            fallback_dom_lower = fallback_dom.lower()
-            if fallback_dom_lower not in domains_to_try:
-                domains_to_try.append(fallback_dom_lower)
+        # Domain family fallback (prevent cross-domain leaks)
+        if domain_key in ["data-analyst", "data-science"]:
+            domains_to_try.extend(["data-analyst", "data-science", "analytics"])
+        elif domain_key in ["web-dev", "frontend", "backend", "fullstack"]:
+            domains_to_try.extend(["web-dev", "frontend", "backend", "fullstack"])
+        elif domain_key in ["devops", "cloud", "networking"]:
+            domains_to_try.extend(["devops", "cloud", "networking"])
+        elif domain_key in ["ai-ml", "nlp"]:
+            domains_to_try.extend(["ai-ml", "nlp", "data-science"])
+        else:
+            domains_to_try.extend(["general", "Programming", "Data Structures", "Algorithms"])
 
+        # Deduplicate while preserving order
+        seen_doms = set()
+        domains_to_try = [d for d in domains_to_try if not (d in seen_doms or seen_doms.add(d))]
 
         # Map subjects
         subjects_to_try = []
@@ -262,24 +266,25 @@ def get_curated_questions(
                                         "follow_up_questions": q.get("follow_up_questions", [])
                                     })
 
-    # --- ROBUST FALLBACK (General / default company questions) ---
+    # --- DOMAIN-AWARE FALLBACK ---
+    # Fill remaining slots with domain x year mock templates if JSON search falls short
     if len(selected) < count:
-        def_qs = QB_DATA.get("company_prep", {}).get("default", [])
-        for q in def_qs:
+        from .ai_service import generate_mock_questions
+        # Determine company / role
+        co_name = ""
+        role_name = domain
+        if " - " in domain:
+            parts = domain.split(" - ", 1)
+            co_name = parts[0].strip()
+            role_name = parts[1].strip()
+        mock_qs = generate_mock_questions(category, branch, year, domain, subjects, co_name, role_name)
+        for q in mock_qs:
             if len(selected) >= count:
                 break
-            q_text = q.get("question") or q.get("text")
+            q_text = q.get("text")
             if q_text and q_text not in seen_questions:
                 seen_questions.add(q_text)
-                selected.append({
-                    "text": q_text,
-                    "difficulty": q.get("difficulty", target_difficulty),
-                    "topic": q.get("topic", "General"),
-                    "hint": _make_hint(q),
-                    "ideal_answer": q.get("ideal_answer", ""),
-                    "evaluation_keywords": q.get("evaluation_keywords", []),
-                    "follow_up_questions": q.get("follow_up_questions", [])
-                })
+                selected.append(q)
 
     # --- FINAL SAFETY FALLBACK (HR / behavioral) ---
     if len(selected) < count:
