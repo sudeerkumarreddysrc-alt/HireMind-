@@ -12,10 +12,10 @@ GEMINI_MODEL   = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 # Create a client only when a key is present
 _client = None
 
-def generate_mock_questions(category, branch, year, domain, subjects, company, role):
+def generate_mock_questions(category, branch, year, domain, subjects, company, role, count=10):
     """Generate offline mock questions strictly tailored to BOTH Domain and Academic Year (1-4)."""
     year_str = str(year)
-    diff_name = "Easy" if year_str == "1" else "Medium" if year_str in ["2", "3"] else "Hard"
+    count_val = max(1, int(count or 10))
     dom_clean = (domain or "").lower()
     cat_clean = (category or "").lower()
     sub_main = subjects[0] if subjects else "Core Concepts"
@@ -30,157 +30,102 @@ def generate_mock_questions(category, branch, year, domain, subjects, company, r
 
     # ── 1. WEB DEVELOPMENT DOMAIN ──
     if is_web:
-        if year_str == "1":
-            questions_raw = [
-                ("Introduce yourself. Why are you interested in Web Development and how are you starting to learn HTML, CSS, and JavaScript?", "Self Intro", "Talk about your background, web projects or online courses you started."),
-                ("What is the difference between HTML `<div>` and `<span>` tags? Explain block vs inline layout.", "HTML/CSS Basics", "Div is block-level (full width); Span is inline (wraps content)."),
-                ("What is the difference between `let`, `const`, and `var` in JavaScript?", "JS Fundamentals", "Var is function-scoped; Let and Const are block-scoped. Const cannot be reassigned."),
-                ("What is the DOM (Document Object Model) and how does JavaScript interact with it?", "DOM Basics", "DOM represents the document structure as a tree of nodes that JS can manipulate."),
-                ("How do you ensure a web page looks good on both mobile screens and desktop monitors?", "Responsive Web", "Use CSS media queries, responsive units (%, rem, vw), and flexible layouts.")
-            ]
-        elif year_str == "2":
-            questions_raw = [
-                ("Explain event bubbling and event capturing in JavaScript. How does event delegation improve performance?", "Event Handling", "Event bubbling propagates upward from target to ancestors. Delegation uses a single parent listener."),
-                ("What is the difference between CSS Flexbox and CSS Grid? When would you choose one over the other?", "Frontend Layout", "Flexbox is 1-dimensional (rows OR columns); Grid is 2-dimensional (rows AND columns)."),
-                ("How do Promises and `async/await` work in JavaScript when making asynchronous HTTP requests?", "Async JavaScript", "Promises handle async operations avoiding callback hell; async/await is syntactic sugar over Promises."),
-                ("Explain the HTTP methods GET, POST, PUT, and DELETE and their standard status codes (200, 201, 404, 500).", "REST APIs", "GET retrieves, POST creates, PUT updates, DELETE removes. 200 OK, 201 Created, 404 Not Found, 500 Server Error."),
-                ("Describe a team web project you worked on recently. How did you handle version control with Git?", "Web Project", "Discuss branch creation, pull requests, merge conflict resolution, and teamwork.")
-            ]
-        elif year_str == "3":
-            questions_raw = [
-                ("Explain the difference between Client-Side Rendering (CSR) and Server-Side Rendering (SSR). What are the trade-offs for SEO and page load?", "Rendering Systems", "CSR renders in browser via JS; SSR pre-renders pages on server. CSR is snappy post-load; SSR is better for SEO."),
-                ("In React (or your chosen framework), explain Props vs State and how Component State Management works.", "Frontend Frameworks", "Props are immutable read-only inputs; State is mutable component-driven local data."),
-                ("What is CORS (Cross-Origin Resource Sharing) and how do you secure web APIs using JWT authentication?", "Web Security & Auth", "CORS prevents unauthorized cross-origin requests. JWT tokens contain signed user claims in HTTP headers."),
-                ("How do you optimize web application performance (lazy loading, code splitting, asset compression, CDN)?", "Web Optimization", "Reduce initial bundle size, defer offscreen assets, cache static assets on edge servers."),
-                ("Walk me through a full-stack web project you built. How did you connect the frontend framework to the backend API?", "Fullstack Project", "Use STAR method. Detail API integration, state management, DB persistence, and deployment.")
-            ]
-        else: # Year 4
-            questions_raw = [
-                ("How would you design the architecture for a real-time web application (like Google Docs or live chat) scaling to 100,000 active users?", "Web Architecture", "Use WebSockets/SSE, Redis pub-sub, message queues, horizontally scaled stateless node servers, and DB sharding."),
-                ("Explain OWASP Top 10 web vulnerabilities, specifically Cross-Site Scripting (XSS), CSRF, and SQL Injection. How do you prevent each?", "Web Security", "XSS: sanitize/escape input; CSRF: use anti-CSRF tokens/SameSite cookies; SQLi: parameterized queries."),
-                ("Compare WebSockets, Server-Sent Events (SSE), and HTTP Long Polling for real-time web communication.", "Real-time Protocols", "WebSockets: full-duplex bi-directional; SSE: server-to-client stream; Long Polling: repeated client polls."),
-                ("How do you structure a production Web CI/CD pipeline, including Docker containerization, automated E2E tests, and zero-downtime deployment?", "Web DevOps", "GitHub Actions/Jenkins pipeline building Docker images, running Cypress/Playwright tests, deploying to K8s/ECS."),
-                ("Tell me about a critical production bug or performance bottleneck you resolved in a live web application.", "Web Leadership", "Detail root cause analysis, monitoring tools (Lighthouse/Sentry), fix implementation, and post-mortem.")
-            ]
+        questions_raw = [
+            ("Introduce yourself. Why are you interested in Web Development and how are you starting to learn HTML, CSS, and JavaScript?", "Self Intro", "Talk about your background, web projects or online courses you started."),
+            ("What is the difference between HTML `<div>` and `<span>` tags? Explain block vs inline layout.", "HTML/CSS Basics", "Div is block-level (full width); Span is inline (wraps content)."),
+            ("What is the difference between `let`, `const`, and `var` in JavaScript?", "JS Fundamentals", "Var is function-scoped; Let and Const are block-scoped. Const cannot be reassigned."),
+            ("What is the DOM (Document Object Model) and how does JavaScript interact with it?", "DOM Basics", "DOM represents the document structure as a tree of nodes that JS can manipulate."),
+            ("How do you ensure a web page looks good on both mobile screens and desktop monitors?", "Responsive Web", "Use CSS media queries, responsive units (%, rem, vw), and flexible layouts."),
+            ("Explain event bubbling and event capturing in JavaScript. How does event delegation improve performance?", "Event Handling", "Event bubbling propagates upward from target to ancestors. Delegation uses a single parent listener."),
+            ("What is the difference between CSS Flexbox and CSS Grid? When would you choose one over the other?", "Frontend Layout", "Flexbox is 1-dimensional (rows OR columns); Grid is 2-dimensional (rows AND columns)."),
+            ("How do Promises and `async/await` work in JavaScript when making asynchronous HTTP requests?", "Async JavaScript", "Promises handle async operations avoiding callback hell; async/await is syntactic sugar over Promises."),
+            ("Explain the HTTP methods GET, POST, PUT, and DELETE and their standard status codes (200, 201, 404, 500).", "REST APIs", "GET retrieves, POST creates, PUT updates, DELETE removes. 200 OK, 201 Created, 404 Not Found, 500 Server Error."),
+            ("Explain the difference between Client-Side Rendering (CSR) and Server-Side Rendering (SSR). What are the trade-offs for SEO and page load?", "Rendering Systems", "CSR renders in browser via JS; SSR pre-renders pages on server. CSR is snappy post-load; SSR is better for SEO."),
+            ("In React (or your chosen framework), explain Props vs State and how Component State Management works.", "Frontend Frameworks", "Props are immutable read-only inputs; State is mutable component-driven local data."),
+            ("How would you design the architecture for a real-time web application (like Google Docs or live chat) scaling to 100,000 active users?", "Web Architecture", "Use WebSockets/SSE, Redis pub-sub, message queues, horizontally scaled stateless node servers, and DB sharding.")
+        ]
 
     # ── 2. DATA ANALYST DOMAIN ──
     elif is_data:
-        if year_str == "1":
-            questions_raw = [
-                ("Introduce yourself. Why did you choose Data Analytics and how do you approach working with data?", "Introduction", "Mention your academic background, interest in data insights, and basic tools like Excel or Python."),
-                ("What is the difference between VLOOKUP and XLOOKUP in Microsoft Excel?", "Spreadsheets", "XLOOKUP replaces VLOOKUP: searches in any direction, doesn't require column index numbers, defaults to exact match."),
-                ("Explain the basic statistical metrics: Mean, Median, and Mode. When is Median preferred over Mean?", "Descriptive Stats", "Mean is average; Median is middle value; Mode is most frequent. Median is better when data has extreme outliers."),
-                ("What is the difference between a Bar Chart and a Line Chart? When should you use each?", "Data Visualization", "Bar charts compare categorical values; Line charts show continuous trends over time."),
-                ("How do you organize messy data in a spreadsheet before beginning analysis?", "Data Basics", "Remove duplicates, fix formatting, handle blank cells, and separate concatenated text columns.")
-            ]
-        elif year_str == "2":
-            questions_raw = [
-                ("Write the SQL query structure to select records where `sales > 10000`, grouped by `region`, ordered by total sales descending.", "SQL Queries", "SELECT region, SUM(sales) FROM data WHERE sales > 10000 GROUP BY region ORDER BY SUM(sales) DESC;"),
-                ("What is data cleaning, and how do you handle missing values (imputation vs deletion) in a dataset?", "Data Cleaning", "Assess missingness pattern: drop rows if sparse, impute mean/median for numerical, mode for categorical."),
-                ("In Python Pandas, what is the difference between a Series and a DataFrame?", "Python Pandas", "Series is a 1-dimensional labeled array; DataFrame is a 2-dimensional tabular structure with labeled axes."),
-                ("Explain the difference between Population and Sample in statistics. Why is random sampling essential?", "Statistical Sampling", "Population is the entire set; Sample is a subset. Random sampling avoids selection bias."),
-                ("Describe a team project where you analyzed a dataset to extract actionable insights or solve a case study.", "Analytics Project", "Explain the dataset, tools used (Excel/SQL/Python), metrics calculated, and conclusion.")
-            ]
-        elif year_str == "3":
-            questions_raw = [
-                ("Explain the different types of SQL Joins (INNER, LEFT, RIGHT, FULL) with a concrete business example.", "Advanced SQL", "INNER matches both; LEFT includes all left + matched right; RIGHT includes all right; FULL includes all."),
-                ("What is Exploratory Data Analysis (EDA)? Walk me through your step-by-step EDA process when given a new dataset.", "Analytics Pipeline", "Inspect shape/dtypes, summary statistics, missing values, distribution plots, correlation matrix, outlier detection."),
-                ("How do you calculate and interpret Key Performance Indicators (KPIs) like Customer Acquisition Cost (CAC) and Retention Rate?", "Business Intelligence", "CAC = Total Marketing & Sales Costs / New Customers; Retention = (End Customers - New) / Start Customers."),
-                ("Explain hypothesis testing, null hypothesis ($H_0$), p-value, and significance level ($\alpha = 0.05$).", "Inferential Stats", "H0 assumes no effect. P-value measures probability of data under H0. Reject H0 if p-value < alpha."),
-                ("Describe a dashboard you built in Tableau or Power BI. How did you choose charts to effectively communicate insights?", "BI Dashboards", "Focus on executive metrics at top, trend lines in middle, interactive filters, and drill-down tables.")
-            ]
-        else: # Year 4
-            questions_raw = [
-                ("What are SQL Window Functions (`ROW_NUMBER()`, `RANK()`, `LEAD()`, `LAG()`)? Write an example query to rank employee sales per department.", "Complex SQL", "SELECT dept, emp, sales, RANK() OVER (PARTITION BY dept ORDER BY sales DESC) FROM employees;"),
-                ("How do you design and evaluate an A/B test for a major product update? Discuss sample size, statistical power, and novelty bias.", "Experimental Design", "Define metric, calculate required sample size for 80% power, split traffic randomly, compute t-test/z-test p-value."),
-                ("Explain dimensional modeling in Data Warehousing: Star Schema vs Snowflake Schema, Fact tables vs Dimension tables.", "Data Warehousing", "Fact tables contain metrics/numerical measures; Dimension tables contain context attributes. Star schema is denormalized."),
-                ("How do you handle big data in Python when a dataset exceeds available RAM (chunking, Dask, PySpark, SQL pushdown)?", "Big Data Analytics", "Process data in chunks via Pandas `chunksize`, use columnar Parquet format, or offload heavy aggregations to SQL/PySpark."),
-                ("Describe a scenario where your data analysis led to a strategic recommendation that was contested by business stakeholders.", "Stakeholder Management", "Use STAR method: detail data validation, sensitivity analysis, clear visual storytelling, and consensus building.")
-            ]
+        questions_raw = [
+            ("Introduce yourself. Why did you choose Data Analytics and how do you approach working with data?", "Introduction", "Mention your academic background, interest in data insights, and basic tools like Excel or Python."),
+            ("What is the difference between VLOOKUP and XLOOKUP in Microsoft Excel?", "Spreadsheets", "XLOOKUP replaces VLOOKUP: searches in any direction, doesn't require column index numbers, defaults to exact match."),
+            ("Explain the basic statistical metrics: Mean, Median, and Mode. When is Median preferred over Mean?", "Descriptive Stats", "Mean is average; Median is middle value; Mode is most frequent. Median is better when data has extreme outliers."),
+            ("What is the difference between a Bar Chart and a Line Chart? When should you use each?", "Data Visualization", "Bar charts compare categorical values; Line charts show continuous trends over time."),
+            ("How do you organize messy data in a spreadsheet before beginning analysis?", "Data Basics", "Remove duplicates, fix formatting, handle blank cells, and separate concatenated text columns."),
+            ("Write the SQL query structure to select records where `sales > 10000`, grouped by `region`, ordered by total sales descending.", "SQL Queries", "SELECT region, SUM(sales) FROM data WHERE sales > 10000 GROUP BY region ORDER BY SUM(sales) DESC;"),
+            ("What is data cleaning, and how do you handle missing values (imputation vs deletion) in a dataset?", "Data Cleaning", "Assess missingness pattern: drop rows if sparse, impute mean/median for numerical, mode for categorical."),
+            ("In Python Pandas, what is the difference between a Series and a DataFrame?", "Python Pandas", "Series is a 1-dimensional labeled array; DataFrame is a 2-dimensional tabular structure with labeled axes."),
+            ("Explain the different types of SQL Joins (INNER, LEFT, RIGHT, FULL) with a concrete business example.", "Advanced SQL", "INNER matches both; LEFT includes all left + matched right; RIGHT includes all right; FULL includes all."),
+            ("What is Exploratory Data Analysis (EDA)? Walk me through your step-by-step EDA process when given a new dataset.", "Analytics Pipeline", "Inspect shape/dtypes, summary statistics, missing values, distribution plots, correlation matrix, outlier detection."),
+            ("How do you calculate and interpret Key Performance Indicators (KPIs) like Customer Acquisition Cost (CAC) and Retention Rate?", "Business Intelligence", "CAC = Total Marketing & Sales Costs / New Customers; Retention = (End Customers - New) / Start Customers."),
+            ("What are SQL Window Functions (`ROW_NUMBER()`, `RANK()`, `LEAD()`, `LAG()`)? Write an example query to rank employee sales per department.", "Complex SQL", "SELECT dept, emp, sales, RANK() OVER (PARTITION BY dept ORDER BY sales DESC) FROM employees;")
+        ]
 
     # ── 3. COMPANY PREPARATION ──
     elif is_company:
         target_co = company or "our target company"
         target_role = role or domain or "Software Engineer"
-        if year_str == "1":
-            questions_raw = [
-                (f"Why do you want to work at {target_co} specifically? What excites you about our company mission and products?", "Company Fit", f"Research {target_co}'s products, tech culture, and core values before answering."),
-                (f"Walk me through your academic background and key introductory coursework preparing you for a role at {target_co}.", "Introduction", "Summarize your stream, core subjects, and personal projects."),
-                (f"What is your strategy for mastering new tools and technologies required for an internship at {target_co}?", "Learning Mindset", "Discuss documentation reading, building small practice applications, and asking structured questions."),
-                ("Explain a basic programming concept or problem-solving technique you mastered recently.", "Tech Fundamentals", "Explain syntax, logic, or data structures with a clear example."),
-                ("How do you handle tight assignment deadlines and academic pressure?", "Time Management", "Prioritize tasks, eliminate distractions, and maintain clear communication.")
-            ]
-        elif year_str == "2":
-            questions_raw = [
-                (f"How do your technical skills and sophomore projects align with the requirements for a {target_role} position at {target_co}?", "Role Alignment", f"Connect your data structures, web, or branch coursework to {target_co}'s domain."),
-                ("Given an array of integers, describe an efficient approach to find two numbers that sum to a target value.", "Algorithms", "Use a Hash Map to store complement values for O(n) time and O(n) space."),
-                (f"Explain Object-Oriented Programming (OOP) or Database normalization concepts relevant to software engineering at {target_co}.", "Core Tech", "Cover Encapsulation, Inheritance, Polymorphism, and 1NF-3NF data integrity."),
-                ("Describe a team project where you had to adapt to changing requirements or design choices mid-way.", "Adaptability", "Detail how your team communicated, evaluated alternatives, and refactored code."),
-                (f"What makes {target_co}'s products or technical architecture stand out compared to industry competitors?", "Industry Knowledge", f"Mention specific engineering blog posts or key product features of {target_co}.")
-            ]
-        elif year_str == "3":
-            questions_raw = [
-                (f"Describe a major technical project or internship experience that directly demonstrates your readiness for {target_role} at {target_co}.", "Project STAR", "Detail Situation, Task, Action (your specific contribution), and quantitative Result."),
-                (f"How would you design a core feature or module for one of {target_co}'s major software products?", "Practical Design", "Outline requirements, data flow, API endpoints, and storage mechanism."),
-                ("Explain how you debug a complex issue in a web/software application. What tools and metrics do you use?", "Technical Depth", "Check logs, use breakpoints/profilers, reproduce minimal test cases, and write regression tests."),
-                ("Tell me about a time you disagreed with a teammate's technical decision. How did you resolve the conflict?", "Conflict Resolution", "Focus on data-driven discussion, listing pros/cons, prototyping options, and respecting team consensus."),
-                (f"What technical questions do you have for our engineering team regarding working at {target_co}?", "Candidate Inquiry", f"Ask about team structure, deployment frequency, tech stack evolution, or mentorship at {target_co}.")
-            ]
-        else: # Year 4
-            questions_raw = [
-                (f"Walk me through the most technically challenging problem you solved in an internship or major project. How does this prepare you for {target_co}?", "Advanced Engineering", "Detail complex trade-offs (latency vs throughput), root cause analysis, and measurable impact."),
-                (f"How would you design a scalable distributed system for {target_co} handling millions of daily active users?", "System Design", "Discuss microservices, load balancing, message queues (Kafka), caching (Redis), and database sharding."),
-                (f"In a competitive placement coding round for {target_co}, how do you analyze and optimize time and space complexity?", "Algorithmic Depth", "Explain Big-O analysis, trade-offs between space and time, and dynamic programming/heap strategies."),
-                ("Describe how you approach refactoring a legacy codebase without breaking existing business logic or API contracts.", "Software Quality", "Write comprehensive unit/integration tests first, use Strangler Fig pattern, and deploy incrementally."),
-                ("Tell me about a project milestone you failed to achieve on time. What went wrong and how did you communicate with leadership?", "Crisis Management", "Be honest, take accountability, explain risk mitigation strategies, and share lessons learned.")
-            ]
+        questions_raw = [
+            (f"Why do you want to work at {target_co} specifically? What excites you about our company mission and products?", "Company Fit", f"Research {target_co}'s products, tech culture, and core values before answering."),
+            (f"Walk me through your academic background and key introductory coursework preparing you for a role at {target_co}.", "Introduction", "Summarize your stream, core subjects, and personal projects."),
+            (f"What is your strategy for mastering new tools and technologies required for an internship at {target_co}?", "Learning Mindset", "Discuss documentation reading, building small practice applications, and asking structured questions."),
+            ("Explain a basic programming concept or problem-solving technique you mastered recently.", "Tech Fundamentals", "Explain syntax, logic, or data structures with a clear example."),
+            (f"How do your technical skills align with the requirements for a {target_role} position at {target_co}?", "Role Alignment", f"Connect your data structures, web, or branch coursework to {target_co}'s domain."),
+            ("Given an array of integers, describe an efficient approach to find two numbers that sum to a target value.", "Algorithms", "Use a Hash Map to store complement values for O(n) time and O(n) space."),
+            (f"Explain Object-Oriented Programming (OOP) or Database normalization concepts relevant to software engineering at {target_co}.", "Core Tech", "Cover Encapsulation, Inheritance, Polymorphism, and 1NF-3NF data integrity."),
+            ("Describe a team project where you had to adapt to changing requirements or design choices mid-way.", "Adaptability", "Detail how your team communicated, evaluated alternatives, and refactored code."),
+            (f"Describe a major technical project or internship experience that directly demonstrates your readiness for {target_role} at {target_co}.", "Project STAR", "Detail Situation, Task, Action (your specific contribution), and quantitative Result."),
+            (f"How would you design a core feature or module for one of {target_co}'s major software products?", "Practical Design", "Outline requirements, data flow, API endpoints, and storage mechanism."),
+            ("Explain how you debug a complex issue in a web/software application. What tools and metrics do you use?", "Technical Depth", "Check logs, use breakpoints/profilers, reproduce minimal test cases, and write regression tests."),
+            (f"Walk me through the most technically challenging problem you solved in an internship or major project. How does this prepare you for {target_co}?", "Advanced Engineering", "Detail complex trade-offs (latency vs throughput), root cause analysis, and measurable impact.")
+        ]
 
     # ── 4. CUSTOM OR GENERAL SOFTWARE DEVELOPMENT DOMAIN ──
     else:
-        topic_name = domain or subjects[0] if subjects else "Software Engineering"
-        if year_str == "1":
-            questions_raw = [
-                (f"Introduce yourself and explain why you chose {topic_name} as your area of interest.", "Self Introduction", "Structure: background, interest in this field, and goals."),
-                (f"What are the foundational concepts in '{sub_main}' that every beginner should understand?", "Fundamentals", "Define the core terms, primary use case, and basic syntax/logic."),
-                ("What is the difference between a variable and a constant in programming? Give a real-world analogy.", "Programming Basics", "Variable holds values that change; constant holds fixed immutable values."),
-                ("How do you approach learning a completely new programming language or framework from scratch?", "Learning Process", "Read official documentation, follow tutorials, build small practice applications."),
-                ("How do you manage study schedules and project tasks when facing tight deadlines?", "Personal Management", "Prioritize tasks, break work into milestones, and minimize distractions.")
-            ]
-        elif year_str == "2":
-            questions_raw = [
-                (f"Explain the core technical concepts of '{sub_main}' and how it is applied in practical projects.", "Core Subject", "Describe the theoretical principles and common practical applications."),
-                ("Explain the concept of Object-Oriented Programming (OOP) and its four main pillars.", "OOP Principles", "Encapsulation, Inheritance, Polymorphism, Abstraction."),
-                ("What is the difference between an Array and a Linked List in memory structure and search performance?", "Data Structures", "Array: contiguous memory, O(1) random access; Linked List: pointers, O(n) sequential access."),
-                ("Explain the difference between SQL relational databases and NoSQL document databases.", "Databases", "SQL has structured schema and ACID compliance; NoSQL is schema-less and scales horizontally."),
-                ("Describe a team project where team members had different technical ideas. How did you reach an agreement?", "Team Collaboration", "Compare pro/cons of proposals, build quick prototypes, and seek consensus.")
-            ]
-        elif year_str == "3":
-            questions_raw = [
-                (f"Describe a complex project you built incorporating '{sub_main}'. What was your tech stack and architectural approach?", "Project Deep-Dive", "Use STAR method: situation, your role, technical architecture, and results."),
-                ("How would you design a clean RESTful API interface for a client-server application?", "API Architecture", "Use standard HTTP verbs, clear URL endpoints, JSON payloads, and appropriate HTTP status codes."),
-                ("What is the difference between synchronous and asynchronous execution? How does asynchronous I/O improve system throughput?", "Concurrency", "Synchronous blocks execution until task finishes; Asynchronous delegates tasks and processes callbacks/futures."),
-                ("Explain database normalization (1NF, 2NF, 3NF) and when you might intentionally denormalize a database.", "Database Design", "Normalization eliminates redundancy; Denormalization improves read query performance at the expense of storage."),
-                ("Describe an internship or practical hands-on experience where you resolved a tricky technical bug.", "Technical Troubleshooting", "Explain debugging tools, stack trace inspection, isolating root cause, and regression testing.")
-            ]
-        else: # Year 4
-            questions_raw = [
-                (f"How would you design a high-availability, scalable system architecture incorporating '{sub_main}' handling high traffic?", "System Architecture", "Discuss load balancers, caching layers, message queues, stateless microservices, and DB replication."),
-                ("Explain the CAP Theorem in distributed systems. How do AP systems differ from CP systems during network partitions?", "Distributed Systems", "Consistency vs Availability vs Partition Tolerance. Explain database trade-offs like Cassandra vs MongoDB."),
-                ("How do you profile, identify, and resolve memory leaks or severe performance bottlenecks in software applications?", "Performance Optimization", "Use memory profilers, heap dumps, CPU flame graphs, optimize DB queries/indexes, and reduce garbage collection overhead."),
-                ("Describe your process for conducting code reviews, maintaining software quality, and enforcing CI/CD pipelines.", "Engineering Quality", "Check readability, test coverage, security vulnerabilities, edge cases, and automated build pipelines."),
-                ("Tell me about a major technical decision you led during a project that had significant trade-offs. How did you measure success?", "Senior Engineering Judgement", "Discuss trade-offs (e.g. latency vs consistency, build vs buy), metrics evaluated, and long-term impact.")
-            ]
+        topic_name = domain or (subjects[0] if subjects else "Software Engineering")
+        questions_raw = [
+            (f"Introduce yourself and explain why you chose {topic_name} as your area of interest.", "Self Introduction", "Structure: background, interest in this field, and goals."),
+            (f"What are the foundational concepts in '{sub_main}' that every beginner should understand?", "Fundamentals", "Define the core terms, primary use case, and basic syntax/logic."),
+            ("What is the difference between a variable and a constant in programming? Give a real-world analogy.", "Programming Basics", "Variable holds values that change; constant holds fixed immutable values."),
+            ("How do you approach learning a completely new programming language or framework from scratch?", "Learning Process", "Read official documentation, follow tutorials, build small practice applications."),
+            (f"Explain the core technical concepts of '{sub_main}' and how it is applied in practical projects.", "Core Subject", "Describe the theoretical principles and common practical applications."),
+            ("Explain the concept of Object-Oriented Programming (OOP) and its four main pillars.", "OOP Principles", "Encapsulation, Inheritance, Polymorphism, Abstraction."),
+            ("What is the difference between an Array and a Linked List in memory structure and search performance?", "Data Structures", "Array: contiguous memory, O(1) random access; Linked List: pointers, O(n) sequential access."),
+            ("Explain the difference between SQL relational databases and NoSQL document databases.", "Databases", "SQL has structured schema and ACID compliance; NoSQL is schema-less and scales horizontally."),
+            (f"Describe a complex project you built incorporating '{sub_main}'. What was your tech stack and architectural approach?", "Project Deep-Dive", "Use STAR method: situation, your role, technical architecture, and results."),
+            ("How would you design a clean RESTful API interface for a client-server application?", "API Architecture", "Use standard HTTP verbs, clear URL endpoints, JSON payloads, and appropriate HTTP status codes."),
+            ("What is the difference between synchronous and asynchronous execution? How does asynchronous I/O improve system throughput?", "Concurrency", "Synchronous blocks execution until task finishes; Asynchronous delegates tasks and processes callbacks/futures."),
+            (f"How would you design a high-availability, scalable system architecture incorporating '{sub_main}' handling high traffic?", "System Architecture", "Discuss load balancers, caching layers, message queues, stateless microservices, and DB replication.")
+        ]
 
-    # Package into standardized question dictionary format
+    # Assign progressive difficulty across the count_val questions
+    easy_count = max(1, int(round(count_val * 0.3)))
+    hard_count = max(1, int(round(count_val * 0.3)))
+    medium_count = max(1, count_val - easy_count - hard_count)
+
     questions = []
-    for text, topic, hint in questions_raw:
+    for idx, (text, topic, hint) in enumerate(questions_raw[:count_val]):
+        diff = "Easy" if idx < easy_count else "Medium" if idx < (easy_count + medium_count) else "Hard"
         questions.append({
             "text": text,
-            "difficulty": diff_name,
+            "difficulty": diff,
             "topic": topic,
             "hint": hint
         })
-    return questions
+
+    # If pool is shorter than count_val, extend with general questions
+    while len(questions) < count_val:
+        idx = len(questions)
+        diff = "Easy" if idx < easy_count else "Medium" if idx < (easy_count + medium_count) else "Hard"
+        questions.append({
+            "text": f"Question {idx + 1}: Explain your practical approach to problem solving and debugging in {sub_main}.",
+            "difficulty": diff,
+            "topic": "Problem Solving",
+            "hint": "Structure your answer with clear steps: reproduce, isolate, fix, and verify."
+        })
+
+    return questions[:count_val]
 
 is_real_key = False
 if GEMINI_API_KEY:
@@ -445,10 +390,23 @@ def _get_json_response(prompt: str) -> dict:
             "The Gemini AI service is currently unavailable. Please try again later."
         ) from exc
 
-    raw = response.text
-    if raw.strip().startswith("```"):
-        lines = raw.strip().splitlines()
-        raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+    raw = response.text.strip() if response.text else ""
+
+    # Clean markdown fences if present
+    if "```" in raw:
+        import re
+        match = re.search(r'```(?:json)?\s*(\{.*\}|\[.*\])\s*```', raw, re.DOTALL)
+        if match:
+            raw = match.group(1)
+        else:
+            lines = [line for line in raw.splitlines() if not line.strip().startswith("```")]
+            raw = "\n".join(lines).strip()
+
+    # Extract JSON object substring
+    start_brace = raw.find("{")
+    end_brace = raw.rfind("}")
+    if start_brace != -1 and end_brace != -1 and end_brace > start_brace:
+        raw = raw[start_brace:end_brace + 1]
 
     try:
         return json.loads(raw)
@@ -465,48 +423,69 @@ def generate_interview_questions(
     domain: str,
     year: str,
     subjects: list,
-    count: int = 5
+    count: int = 10
 ) -> list:
-    """Generate interview questions tailored specifically to Domain and Academic Year (1-4).
+    """Generate dynamic interview questions tailored specifically to candidate configuration and Academic Year (1-4).
 
     Uses Gemini AI if configured, with automatic fallback to the curated question bank.
+    Default count: 10 questions (supports 12 when requested).
     """
     year_str = str(year or "1")
-    target_diff = "Easy" if year_str == "1" else "Medium" if year_str in ["2", "3"] else "Hard"
+    count_val = max(1, int(count or 10))
+
+    # Calculate progressive difficulty distribution for count_val (default 10)
+    easy_count = max(1, int(round(count_val * 0.3)))
+    hard_count = max(1, int(round(count_val * 0.3)))
+    medium_count = max(1, count_val - easy_count - hard_count)
+
+    easy_range = f"Questions 1 to {easy_count}"
+    medium_range = f"Questions {easy_count + 1} to {easy_count + medium_count}"
+    hard_range = f"Questions {easy_count + medium_count + 1} to {count_val}"
 
     if _client:
         try:
             subj_str = ", ".join(subjects) if subjects else "General domain subjects"
-            prompt = f"""You are an expert technical interviewer and hiring assessment lead.
-Generate exactly {count} distinct interview questions tailored to the candidate's exact Domain and Academic Year level.
+            company_context = ""
+            if category.lower() == "company" or "company" in domain.lower() or " - " in domain:
+                company_context = f"\n- Company/Role Context: Tailor questions to candidate's target company and position ({domain}). Do NOT invent non-public company policies, internal proprietary systems, or fake facts. Base questions on publicly known technical standards and role expectations."
 
-Candidate Profile:
+            prompt = f"""You are an expert technical interviewer and hiring assessment lead.
+Generate a complete, coherent interview consisting of EXACTLY {count_val} distinct questions dynamically tailored to the candidate's setup configuration.
+
+Candidate Configuration:
 - Category: {category}
 - Branch/Stream: {branch}
 - Target Domain/Role: {domain}
-- Academic Year / Level: Year {year_str} (Year 1=Freshman Fundamentals, Year 2=Sophomore Core Concepts, Year 3=Junior Advanced & Frameworks, Year 4=Senior Placement & System Architecture)
-- Specific Focus Subjects: {subj_str}
+- Academic Year / Level: Year {year_str} (Year 1=Freshman Fundamentals, Year 2=Sophomore Core Concepts, Year 3=Junior Advanced Frameworks & APIs, Year 4=Senior Placement & Production Architecture){company_context}
+- Focus Subjects: {subj_str}
 
-STRICT SPECIFICATION RULES:
-1. DOMAIN SPECIFICITY:
-   - "Web Development": Ask about HTML/CSS, JavaScript/ES6+, DOM, React/Vue/Node, REST APIs, databases, web security, performance, deployment.
-   - "Data Analyst": Ask about Excel/spreadsheets, SQL (queries, joins, CTEs), statistics, data cleaning, Python/Pandas, visualization (Tableau/PowerBI), business KPIs.
-   - "Software Development": Ask about programming, DSA, OOP, algorithms, debugging, software engineering principles.
-   - "Company Preparation" or "Company - Role": Ask company-specific and role-specific technical and behavioral questions for that company/role.
-   - "Custom Interview": Base questions strictly on the custom topic: "{domain}".
+STRICT INTERVIEW STRUCTURE & PROGRESSIVE DIFFICULTY:
+The interview MUST follow a structured progressive difficulty curve:
+- {easy_range} (Difficulty: "Easy"): Fundamental questions testing basic concepts, syntax, definitions, core understanding, and foundational principles suitable for the candidate's academic year.
+- {medium_range} (Difficulty: "Medium"): Moderate difficulty questions testing practical application, framework mechanics, component interaction, and hands-on scenarios.
+- {hard_range} (Difficulty: "Hard"): Advanced questions testing deeper technical reasoning, edge cases, system trade-offs, optimization, and complex problem-solving.
 
-2. ACADEMIC YEAR SPECIFICITY (Tailor subject matter and scenario complexity, not just difficulty labels):
-   - Year 1: Core fundamentals, basic syntax/definitions, simple logic, basic problem solving, learning motivation.
-   - Year 2: Intermediate concepts, core data structures/OOP/SQL queries, small practical scenarios and project components.
-   - Year 3: Advanced concepts, framework architecture, API integration, technical trade-offs, internship/practical project scenarios.
-   - Year 4: Placement/interview-level depth, edge-case optimization, real-world architecture/system design scenarios, production trade-offs, behavioral STAR method.
+ACADEMIC YEAR ADAPTATION (CRITICAL):
+- Year 1 Students: Ask freshman-level fundamentals, core syntax, simple logic, basic learning motivation. DO NOT ask advanced professional, complex architecture, or senior placement questions.
+- Year 2 Students: Ask sophomore-level core concepts, basic data structures, OOP principles, simple database queries.
+- Year 3 Students: Ask junior-level framework architecture, REST API design, component state, practical internship scenarios.
+- Year 4 Students: Ask senior placement-level depth, edge-case optimization, real-world system architecture, production trade-offs.
+
+STRICT QUALITY CONSTRAINTS:
+1. NO duplicate or nearly identical questions.
+2. NO questions outside the selected domain/role or focus subjects.
+3. NO questions requiring private information not provided by the candidate.
+4. NO fake company facts, invented internal tools, or fabricated company policies.
+5. NO questions that contain their own answers.
+6. NO repeating the same narrow concept unless intentionally building progressive difficulty.
+7. Allowed difficulty values MUST be EXACTLY one of: "Easy", "Medium", "Hard".
 
 Return ONLY a valid JSON object matching this exact format (no extra text, no markdown code fences):
 {{
   "questions": [
     {{
-      "text": "Clear, direct question text",
-      "difficulty": "{target_diff}",
+      "text": "Clear, direct, and well-formulated question text",
+      "difficulty": "Easy",
       "topic": "Specific topic name",
       "hint": "Short non-spoiling preview or talking point hint"
     }}
@@ -517,16 +496,47 @@ Return ONLY a valid JSON object matching this exact format (no extra text, no ma
             raw_qs = res.get("questions", []) if isinstance(res, dict) else []
             if isinstance(raw_qs, list) and len(raw_qs) > 0:
                 valid_qs = []
-                for q in raw_qs[:count]:
-                    if isinstance(q, dict) and "text" in q and len(q["text"].strip()) > 5:
+                seen_texts = set()
+
+                for idx, q in enumerate(raw_qs):
+                    if isinstance(q, dict) and "text" in q and len(str(q["text"]).strip()) > 5:
+                        q_text = str(q["text"]).strip()
+                        if q_text.lower() in seen_texts:
+                            continue
+                        seen_texts.add(q_text.lower())
+
+                        expected_diff = "Easy" if idx < easy_count else "Medium" if idx < (easy_count + medium_count) else "Hard"
+                        raw_diff = str(q.get("difficulty", expected_diff)).strip().capitalize()
+                        if raw_diff not in ["Easy", "Medium", "Hard"]:
+                            raw_diff = expected_diff
+
+                        topic_val = str(q.get("topic") or domain.replace("-", " ").title()).strip()
+                        hint_val = str(q.get("hint") or "").strip()
+
                         valid_qs.append({
-                            "text": q["text"].strip(),
-                            "difficulty": q.get("difficulty", target_diff),
-                            "topic": q.get("topic", domain.replace("-", " ").title()),
-                            "hint": q.get("hint", "")
+                            "text": q_text,
+                            "difficulty": raw_diff,
+                            "topic": topic_val,
+                            "hint": hint_val
                         })
-                if len(valid_qs) >= count:
-                    return valid_qs[:count]
+
+                if len(valid_qs) >= count_val:
+                    return valid_qs[:count_val]
+
+                # Safe Recovery: If Gemini generated fewer questions than requested, supplement to reach count_val
+                if len(valid_qs) > 0:
+                    from .question_bank import get_curated_questions
+                    fallback_qs = get_curated_questions(
+                        category=category, branch=branch, domain=domain,
+                        year=year, subjects=subjects, count=count_val
+                    )
+                    for fq in fallback_qs:
+                        if len(valid_qs) >= count_val:
+                            break
+                        if fq["text"].lower() not in seen_texts:
+                            seen_texts.add(fq["text"].lower())
+                            valid_qs.append(fq)
+                    return valid_qs[:count_val]
         except Exception as exc:
             print(f"[HireMind] Gemini AI question generation failed ({exc}). Using curated question bank.")
 
@@ -537,7 +547,7 @@ Return ONLY a valid JSON object matching this exact format (no extra text, no ma
         domain=domain,
         year=year,
         subjects=subjects,
-        count=count
+        count=count_val
     )
 
 

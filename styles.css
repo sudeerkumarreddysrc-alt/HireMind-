@@ -4703,3 +4703,316 @@ body {
   .cmodal-footer       { padding-left: 20px; padding-right: 20px; }
 }
 
+/* =============================================
+   COMPREHENSIVE MOBILE RESPONSIVENESS & TOUCH ACCESSIBILITY
+   (Applied via media queries so Desktop remains 100% intact)
+   ============================================= */
+
+/* ── Tablets & Mobile (<= 768px) ── */
+@media (max-width: 768px) {
+  /* Dashboard Header & Greetings */
+  .dashboard-greeting h1 {
+    font-size: clamp(1.35rem, 5vw, 1.85rem);
+  }
+  .dashboard-greeting p {
+    font-size: 0.85rem;
+  }
+
+  /* Status Bar Icons & Cards */
+  .status-pill {
+    padding: 14px 16px;
+    min-height: 48px;
+    gap: 12px;
+  }
+  .status-pill-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+  }
+  .status-pill-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .status-pill-value {
+    font-size: 1.15rem;
+  }
+
+  /* Category Cards & Icons */
+  .category-card {
+    padding: 14px 16px;
+    gap: 12px;
+    min-height: 48px;
+  }
+  .category-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+  }
+  .category-icon-wrap svg {
+    width: 18px;
+    height: 18px;
+  }
+  .category-name {
+    font-size: 0.9rem;
+  }
+  .category-desc {
+    font-size: 0.76rem;
+  }
+
+  /* Setup Modals (General & Company Prep) */
+  .setup-modal,
+  #company-setup-modal {
+    padding: 20px 16px;
+    gap: 16px;
+    max-height: 92vh;
+  }
+  .setup-header,
+  .cmodal-header {
+    padding-bottom: 12px;
+    gap: 12px;
+  }
+  .setup-title,
+  .setup-title#cmodal-title {
+    font-size: clamp(1.15rem, 4vw, 1.35rem);
+  }
+  .setup-subtitle,
+  .setup-subtitle#cmodal-desc {
+    font-size: 0.8rem;
+  }
+  
+  /* Setup Step Counter & Progress */
+  .setup-step-dot,
+  .cmodal-step-dot {
+    width: 26px;
+    height: 26px;
+    font-size: 0.72rem;
+  }
+  .setup-step-dot svg,
+  .cmodal-step-dot svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Option Cards inside Modals */
+  .year-card-inner,
+  .cmodal-year-card {
+    padding: 12px 6px;
+    min-height: 44px;
+  }
+  .year-num,
+  .cmodal-year-num {
+    font-size: 1.3rem;
+  }
+  .year-text,
+  .cmodal-year-text {
+    font-size: 0.7rem;
+  }
+
+  .company-select-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .company-select-btn {
+    padding: 10px 8px;
+    min-height: 44px;
+    font-size: 0.78rem;
+  }
+  .company-logo {
+    width: 30px;
+    height: 30px;
+    font-size: 0.72rem;
+  }
+
+  .role-select-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .role-select-btn {
+    padding: 10px 14px;
+    min-height: 44px;
+    font-size: 0.82rem;
+  }
+
+  /* Start Interview & Setup Footer Buttons */
+  .setup-footer,
+  .cmodal-footer {
+    padding-top: 14px;
+    gap: 8px;
+  }
+  .setup-btn-start,
+  .cmodal-btn-start,
+  .setup-btn-next,
+  .cmodal-btn-next,
+  .setup-btn-back,
+  .cmodal-btn-back {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 0.86rem;
+  }
+  .setup-btn-start svg,
+  .cmodal-btn-start svg,
+  .setup-btn-next svg,
+  .cmodal-btn-next svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Interview Screen Controls & Layout */
+  .isess-controls {
+    gap: 8px;
+  }
+  .isess-ctrl-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .isess-ctrl-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .isess-skip-btn,
+  .isess-next-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+  }
+  
+  /* Question Dots Indicator */
+  .isess-dots-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    max-width: 100%;
+    margin-top: 4px;
+  }
+  .isess-dot-item {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+  }
+
+  /* Final Report Screen */
+  .session-complete {
+    padding: 16px 12px;
+  }
+  .scomplete-card {
+    padding: 20px 14px;
+    width: 100%;
+  }
+  .scomplete-title {
+    font-size: clamp(1.3rem, 5vw, 1.7rem);
+  }
+  .scomplete-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .scomplete-review-list {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .scomplete-review-item {
+    padding: 10px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* ── Standard & Small Mobile Phones (<= 480px) ── */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 20px 12px 32px;
+    gap: 20px;
+  }
+  
+  /* Header Badges */
+  .header-badge {
+    padding: 6px 12px;
+    font-size: 0.72rem;
+  }
+
+  /* Status Bar: single or 2 columns with reduced padding */
+  .status-bar {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Setup Modal Padding & Spacing */
+  .setup-modal,
+  #company-setup-modal {
+    padding: 16px 12px;
+    border-radius: var(--radius-md);
+  }
+  .setup-header,
+  .cmodal-header,
+  .cmodal-progress,
+  .cmodal-body,
+  .cmodal-footer {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  /* Year Grid: 2 columns on small screens */
+  .year-grid,
+  .cmodal-year-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .year-card-inner {
+    padding: 10px 4px;
+  }
+  .year-num,
+  .cmodal-year-num {
+    font-size: 1.2rem;
+  }
+
+  /* Question Text on Interview Screen */
+  .isess-question-text {
+    font-size: clamp(0.88rem, 3.8vw, 1.05rem);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  
+  /* Textarea for Candidate Answer */
+  .isess-textarea {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    min-height: 85px;
+    max-height: 130px;
+  }
+
+  /* Final Report Review Items */
+  .scomplete-review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .scomplete-review-meta {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
+/* ── Extra Small Phones (<= 360px) ── */
+@media (max-width: 360px) {
+  .status-bar {
+    grid-template-columns: 1fr;
+  }
+  .year-grid,
+  .cmodal-year-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .setup-btn-start,
+  .cmodal-btn-start,
+  .setup-btn-next,
+  .cmodal-btn-next {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+

@@ -38,7 +38,7 @@ def get_curated_questions(
     domain: str,
     year: str,
     subjects: List[str],
-    count: int = 5
+    count: int = 10
 ) -> List[Dict[str, Any]]:
     """
     Selects a customized list of questions from the offline JSON question bank.
@@ -277,7 +277,7 @@ def get_curated_questions(
             parts = domain.split(" - ", 1)
             co_name = parts[0].strip()
             role_name = parts[1].strip()
-        mock_qs = generate_mock_questions(category, branch, year, domain, subjects, co_name, role_name)
+        mock_qs = generate_mock_questions(category, branch, year, domain, subjects, co_name, role_name, count=count)
         for q in mock_qs:
             if len(selected) >= count:
                 break

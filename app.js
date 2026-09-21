@@ -2030,7 +2030,8 @@ function addActivityEntry(color, text) {
   }
 
   /* â”€â”€ MAIN ENTRY POINT (called by setup modal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  window.startInterviewSession = async function (category, year, branch, domain, subjects) {
+  window.startInterviewSession = async function (category, year, branch, domain, subjects, questionCount) {
+    const targetCount = parseInt(questionCount, 10) || 10;
     sessionState.activeCategory = category;
     sessionState.activeYear = year || '1';
     sessionState.activeBranch = branch || 'other';
@@ -2060,7 +2061,7 @@ function addActivityEntry(color, text) {
       sessionState.isBackendOnline = true;
 
       // 2. Generate AI questions for this session
-      const aiQuestions = await apiPost(`/api/sessions/${sessionData.id}/generate-questions`, {});
+      const aiQuestions = await apiPost(`/api/sessions/${sessionData.id}/generate-questions?count=${targetCount}`, {});
       if (aiQuestions && aiQuestions.length > 0) {
         questions = aiQuestions;
         showSuccessToast('✨ AI-generated questions loaded!');
@@ -2084,8 +2085,20 @@ function addActivityEntry(color, text) {
       } else {
         pool = sampleQuestions[category] || sampleQuestions['custom'];
       }
-      const shuffled = [...(pool || sampleQuestions.custom)].sort(() => 0.5 - Math.random());
-      questions = shuffled.slice(0, 5);
+      let fullPool = [...(pool || sampleQuestions.custom || [])];
+      while (fullPool.length < targetCount) {
+        fullPool = fullPool.concat(sampleQuestions.hr || sampleQuestions.custom || []);
+      }
+      const shuffled = fullPool.sort(() => 0.5 - Math.random());
+      questions = shuffled.slice(0, targetCount);
+
+      // Map progressive difficulty labels on fallback questions
+      const easyBound = Math.max(1, Math.round(targetCount * 0.3));
+      const hardBound = Math.max(1, Math.round(targetCount * 0.3));
+      const medBound = targetCount - easyBound - hardBound;
+      questions.forEach((q, i) => {
+        q.difficulty = i < easyBound ? 'Easy' : i < (easyBound + medBound) ? 'Medium' : 'Hard';
+      });
     } finally {
       hideLoadingOverlay();
     }

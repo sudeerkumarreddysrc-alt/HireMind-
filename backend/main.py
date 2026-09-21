@@ -107,7 +107,7 @@ def create_report(report: schemas.ReportCreate, db: Session = Depends(get_db)):
 
 # --- AI Integration Endpoints ---
 @app.post("/api/sessions/{session_id}/generate-questions", response_model=List[schemas.Question])
-def generate_session_questions(session_id: int, db: Session = Depends(get_db)):
+def generate_session_questions(session_id: int, count: int = 10, db: Session = Depends(get_db)):
     db_session = crud.get_session(db, session_id=session_id)
     if not db_session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -121,7 +121,7 @@ def generate_session_questions(session_id: int, db: Session = Depends(get_db)):
         domain=db_session.domain,
         year=db_session.year or "1",
         subjects=skills,
-        count=5
+        count=count
     )
 
     # Save to database
